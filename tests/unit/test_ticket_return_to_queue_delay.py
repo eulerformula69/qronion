@@ -286,7 +286,6 @@ async def test_cancel_ticket_accepts_other_comment_reason(monkeypatch):
     from app.services import ticket_status
 
     monkeypatch.setattr(ticket_status.manager, "broadcast", fake_broadcast)
-    monkeypatch.setattr(ticket_status.operatorManager, "broadcast", fake_broadcast)
     monkeypatch.setattr(ticket_status, "broadcast_board", fake_broadcast_board)
     monkeypatch.setattr(tickets_router, "ensure_client_operations_allowed", lambda *_: None)
 
@@ -303,7 +302,7 @@ async def test_cancel_ticket_accepts_other_comment_reason(monkeypatch):
     assert db.refreshed is ticket
     assert db.closed is True
     assert [message["type"] for message in broadcasts] == [
-        "ticket.updated", "ticket.updated", "queue_updated", "queue_updated"
+        "ticket.updated", "queue_updated"
     ]
     assert broadcasts[0]["previousStatus"] == "called"
     assert broadcasts[0]["status"] == "cancelled"

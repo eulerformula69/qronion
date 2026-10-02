@@ -5,7 +5,7 @@ from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import Session
 
 from app.config import OPERATOR_SESSION_AUTO_CLEANUP_ENABLED, SESSION_TIMEOUT_SECONDS
-from app.connections import manager, operatorManager
+from app.connections import manager
 from app.database import SessionLocal
 from app.models import (
     AdminSession, Operator,

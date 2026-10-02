@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.connections import manager, operatorManager
+from app.connections import manager
 from app.models import Admin, Ticket, TicketAdminChange
 from app.services.settings import normalize_ticket_reason
 from app.services.tickets import broadcast_board
@@ -59,7 +59,5 @@ async def publish_ticket_updated(ticket_payload: dict, previous_status: str) -> 
         "timestamp": datetime.now().isoformat(),
     }
     await manager.broadcast(event)
-    await operatorManager.broadcast(event)
     await manager.broadcast({"type": "queue_updated"})
-    await operatorManager.broadcast({"type": "queue_updated"})
     await broadcast_board()

@@ -24,7 +24,7 @@ from app.config import (
     TTS_CACHE_DIR, TTS_LENGTH_SCALE,
     TTS_NOISE_SCALE, TTS_NOISE_W_SCALE,
 )
-from app.connections import manager, operatorManager
+from app.connections import manager
 from app.database import SessionLocal
 from app.dependencies import (
     get_current_terminal, get_operator_by_session, verify_admin_session,

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import case, func, text
 from sqlalchemy.orm import Session
 
-from app.connections import manager, operatorManager
+from app.connections import manager
 from app.database import SessionLocal
 from app.models import (
     Operator, OperatorStatusPeriod, Service, Ticket, Window, WindowService,

@@ -47,38 +47,4 @@ class ConnectionManager:
             await self.send_personal_message(message, session_id)
 
 
-class OperatorConnectionManager:
-    def __init__(self):
-        self.connections: dict[int, WebSocket] = {}
-
-    async def connect(self, operator_id: int, websocket: WebSocket):
-        await websocket.accept()
-        self.connections[operator_id] = websocket
-
-    def disconnect(self, operator_id: int):
-        if operator_id in self.connections:
-            del self.connections[operator_id]
-
-    async def send_to_operator(self, operator_id: int, message: dict):
-        websocket = self.connections.get(operator_id)
-        if not websocket:
-            return
-
-        try:
-            await websocket.send_json(message)
-        except Exception:
-            self.disconnect(operator_id)
-
-    async def broadcast(self, message: dict):
-        dead = []
-        for operator_id, connection in self.connections.items():
-            try:
-                await connection.send_json(message)
-            except Exception:
-                dead.append(operator_id)
-        for operator_id in dead:
-            self.disconnect(operator_id)
-
-
 manager = ConnectionManager()
-operatorManager = OperatorConnectionManager()
