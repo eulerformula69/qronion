@@ -887,7 +887,7 @@ async function refreshQueueAndAutoCall() {
 ========================= */
 async function callNext(options = {}) {
     if (currentTicketId !== null && currentTicketId !== undefined) {
-        showToast("Закончите с текущим клиентом!", "danger");
+        showToast("Сначала завершите обслуживание текущего клиента", "danger");
         return;
     }
     if (deferredTicketCount >= operatorSettings.max_deferred_tickets_per_operator) {
@@ -2027,7 +2027,7 @@ async function deferCurrentTicket(reason) {
 
 async function resumeTicket(ticketId, sourceSection = "deferred") {
     if (currentTicketId !== null && currentTicketId !== undefined) {
-        showToast("Закончите с текущим клиентом!", "danger");
+        showToast("Сначала завершите обслуживание текущего клиента", "danger");
         return;
     }
     if (

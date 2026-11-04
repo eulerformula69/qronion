@@ -5,15 +5,42 @@
         const element = document.getElementById("toast-notification");
         if (!element) return;
 
-        element.textContent = message;
+        const variants = {
+            danger: {title: "Ошибка", symbol: "!"},
+            warning: {title: "Действие недоступно", symbol: "!"},
+            success: {title: "Готово", symbol: "✓"}
+        };
+        const variant = variants[type] || variants.danger;
+        const icon = document.createElement("span");
+        icon.className = "operator-toast-icon";
+        icon.setAttribute("aria-hidden", "true");
+        icon.textContent = variant.symbol;
+        const content = document.createElement("div");
+        content.className = "operator-toast-content";
+        const title = document.createElement("strong");
+        title.textContent = variant.title;
+        const description = document.createElement("p");
+        description.textContent = message;
+        content.append(title, description);
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "operator-toast-close";
+        close.setAttribute("aria-label", "Закрыть уведомление");
+        close.textContent = "×";
+        close.addEventListener("click", () => {
+            clearTimeout(toastTimer);
+            element.style.display = "none";
+        });
+        element.replaceChildren(icon, content, close);
         element.dataset.type = type;
         element.setAttribute("role", type === "danger" ? "alert" : "status");
         element.setAttribute("aria-live", type === "danger" ? "assertive" : "polite");
-        element.style.display = "block";
+        element.style.display = "flex";
         if (toastTimer) clearTimeout(toastTimer);
+        if (type === "danger") return;
         toastTimer = setTimeout(() => {
             element.style.display = "none";
-        }, 3000);
+        }, 4000);
     }
 
     function dialog({title, message, actions, content}) {
