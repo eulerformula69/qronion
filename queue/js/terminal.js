@@ -428,16 +428,16 @@ function ensureOperatorChoiceModal() {
     overlay.style.display = "none";
 
     overlay.innerHTML = `
-        <div class="operator-choice-modal">
+        <div class="operator-choice-modal" role="dialog" aria-modal="true" aria-labelledby="operator-choice-title">
             <button type="button" class="operator-choice-close" onclick="closeOperatorChoiceModal()" aria-label="Закрыть">×</button>
-            <h2>Выберите оператора</h2>
+            <h2 id="operator-choice-title">Выберите оператора</h2>
             <div id="operator-choice-service" class="operator-choice-service"></div>
             <select id="operator-choice-select" class="operator-choice-select"></select>
             <div id="operator-choice-error" class="operator-choice-error"></div>
             <div id="operator-choice-list" class="operator-choice-list"></div>
             <div class="operator-choice-actions">
-                <button type="button" class="operator-choice-confirm" onclick="confirmOperatorChoice()">Подтвердить</button>
-                <button type="button" class="operator-choice-cancel" onclick="closeOperatorChoiceModal()">Отмена</button>
+                <button type="button" class="operator-choice-confirm" onclick="confirmOperatorChoice()">Получить талон</button>
+                <button type="button" class="operator-choice-cancel" onclick="closeOperatorChoiceModal()">Назад</button>
             </div>
         </div>
     `;
@@ -511,23 +511,32 @@ operators.forEach(operator => {
     card.type = "button";
     card.className = "operator-choice-card";
     const statusLabels = {
-        online: "🟢 Онлайн",
-        break: "🟡 На перерыве — временно недоступен",
-        offline: "⚪ Офлайн — ожидание может быть долгим"
+        online: "На линии",
+        break: "На перерыве – временно недоступен",
+        offline: "Не на линии – ожидание может быть долгим"
     };
     const title = document.createElement("strong");
-    title.textContent = `${operator.operator_name} — ${operator.window_name}`;
+    title.textContent = `${operator.operator_name} · ${operator.window_name}`;
     const status = document.createElement("span");
     status.className = `operator-choice-status status-${operator.status}`;
     status.textContent = statusLabels[operator.status] || operator.status;
-    card.append(title, status);
+    const details = document.createElement("span");
+    details.className = "operator-choice-details";
+    details.append(title, status);
+    const mark = document.createElement("span");
+    mark.className = "operator-choice-mark";
+    mark.setAttribute("aria-hidden", "true");
+    card.setAttribute("aria-pressed", "false");
+    card.append(details, mark);
 
     card.onclick = () => {
         list.querySelectorAll(".operator-choice-card").forEach(el => {
             el.classList.remove("selected");
+            el.setAttribute("aria-pressed", "false");
         });
 
         card.classList.add("selected");
+        card.setAttribute("aria-pressed", "true");
         confirmBtn.disabled = false;
         window.selectedOperatorWindowId = operator.window_id;
         window.selectedOperatorStatus = operator.status;
