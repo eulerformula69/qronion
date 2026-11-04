@@ -6,13 +6,17 @@ body.board-page[data-board-profile="default"]{
 body.board-page[data-board-profile="default"] h1{
     margin: 20px 24px 8px;
     font-size: 32px;
+    font-weight: 700;
+    line-height: 1.3;
     color: #173037;
     text-align: center;
 }
 body.board-page[data-board-profile="default"] .clock-container{
     margin-bottom: 12px;
-    font-size: 28px;
-    color: #36464d;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: #173037;
     font-variant-numeric: tabular-nums;
 }
 body.board-page[data-board-profile="default"] .board-wrapper-with-waiting{
@@ -27,6 +31,8 @@ body.board-page[data-board-profile="default"] .board-section-header{
     padding: 0;
     color: #173037;
     font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
     text-transform: none;
 }
 body.board-page[data-board-profile="default"] .board-section-waiting{
