@@ -6,9 +6,9 @@
         if (!element) return;
 
         const variants = {
-            danger: {title: "Ошибка", symbol: "!"},
-            warning: {title: "Действие недоступно", symbol: "!"},
-            success: {title: "Готово", symbol: "✓"}
+            danger: {symbol: "!"},
+            warning: {symbol: "!"},
+            success: {symbol: "✓"}
         };
         const variant = variants[type] || variants.danger;
         const icon = document.createElement("span");
@@ -17,11 +17,10 @@
         icon.textContent = variant.symbol;
         const content = document.createElement("div");
         content.className = "operator-toast-content";
-        const title = document.createElement("strong");
-        title.textContent = variant.title;
         const description = document.createElement("p");
-        description.textContent = message;
-        content.append(title, description);
+        description.textContent = message === "Нет ожидающих билетов"
+            ? "Нет ожидающих талонов" : message;
+        content.append(description);
         const close = document.createElement("button");
         close.type = "button";
         close.className = "operator-toast-close";

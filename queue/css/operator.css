@@ -425,8 +425,9 @@ body.operator-page #toast-notification{
     align-items: center;
     gap: 12px;
     box-sizing: border-box;
-    width: min(560px, calc(100vw - 32px));
-    padding: 20px;
+    width: max-content;
+    max-width: min(560px, calc(100vw - 32px));
+    padding: 12px 16px;
     border: 1px solid color-mix(in srgb, var(--toast-color) 40%, white);
     border-radius: 12px;
     background: var(--toast-bg);
@@ -457,10 +458,9 @@ body.operator-page .operator-toast-icon{
     text-align: center;
 }
 body.operator-page .operator-toast-content{ flex: 1; min-width: 0; overflow-wrap: anywhere; }
-body.operator-page .operator-toast-content strong{ color: var(--toast-color); font-size: 17px; font-weight: 600; }
-body.operator-page .operator-toast-content p{ margin: 6px 0 0; font-size: 14px; line-height: 1.5; }
+body.operator-page .operator-toast-content p{ margin: 0; font-size: 14px; line-height: 1.5; }
 body.operator-page .operator-toast-close{
-    align-self: flex-start;
+    align-self: center;
     flex: 0 0 24px;
     width: 24px;
     height: 24px;
