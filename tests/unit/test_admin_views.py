@@ -102,8 +102,8 @@ def test_service_admin_list_hides_visible_id_but_keeps_data_id():
 def test_service_statuses_use_clear_russian_labels_with_terminal_context():
     source = _read("queue/js/admin/views/services.view.js")
 
-    assert '{value: "active", label: "Предоставляется"}' in source
-    assert '{value: "inactive", label: "Не предоставляется"}' in source
+    assert '"Предоставляется"' in source
+    assert 'ctx.ui.switchField("status_active", service.status === "active")' in source
     assert '"Показывается на терминале"' in source
     assert '"Скрыта на терминале"' in source
 
@@ -246,7 +246,7 @@ def test_sorting_layout_has_stable_column_widths():
 
     assert "table-layout: fixed;" in source
     assert "flex: 0 0 12px;" in source
-    assert "grid-template-columns: 34px minmax(260px, 1fr) 165px 215px 120px 140px;" in source
+    assert "grid-template-columns: 24px minmax(180px, 1fr) 165px 140px;" in source
     assert ".admin-service-item .admin-badge" in source
     assert "width: 100%;" in source
     assert "white-space: nowrap;" in source

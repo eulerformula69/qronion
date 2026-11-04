@@ -442,27 +442,33 @@ async def update_services_order(
 @router.patch("/services/{service_id}", tags=["Services"])
 async def rename_service(service_id: int, data: ServiceRename, admin: Admin = Depends(verify_admin_session)):
     db = SessionLocal()
-    service = (
-        db.query(Service)
-        .filter(Service.id == service_id, Service.is_archived == 0)
-        .first()
-    )
-
-    if not service:
+    try:
+        service = db.query(Service).filter(
+            Service.id == service_id, Service.is_archived == 0
+        ).with_for_update().first()
+        if not service:
+            raise HTTPException(status_code=404, detail="Услуга не найдена")
+        changes = data.model_dump(exclude_unset=True)
+        changes["name"] = data.name.strip()
+        if not changes["name"]:
+            raise HTTPException(status_code=400, detail="Введите название услуги")
+        group_id = changes.get("service_group_id")
+        if group_id is not None and not db.query(ServiceGroup.id).filter(ServiceGroup.id == group_id).first():
+            raise HTTPException(status_code=400, detail="Группа не найдена")
+        for key, value in changes.items():
+            if value is None and key != "service_group_id":
+                raise HTTPException(status_code=400, detail="Значение настройки не задано")
+            setattr(service, key, int(value) if isinstance(value, bool) else value)
+        db.commit()
+        db.refresh(service)
+        result = _service_payload(service)
+    except Exception:
+        db.rollback()
+        raise
+    finally:
         db.close()
-        raise HTTPException(status_code=404, detail="Service not found")
-
-    service.name = data.name
-    db.commit()
-    
-    await manager.broadcast({
-        "type": "services_updated"
-    })    
-    
-    db.refresh(service)
-    db.close()
-
-    return service
+    await manager.broadcast({"type": "services_updated"})
+    return result
 
 
 @router.patch("/services/{service_id}/status", tags=["Services"])

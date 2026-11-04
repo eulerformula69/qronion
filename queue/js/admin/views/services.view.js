@@ -4,10 +4,11 @@ let groups = [];
 let draggedServiceId = null;
 let draggedGroupId = null;
 
-const statusOptions = [
-    {value: "active", label: "Предоставляется"},
-    {value: "inactive", label: "Не предоставляется"}
-];
+function serviceCount(count) {
+    const last = count % 10;
+    const teen = count % 100 >= 11 && count % 100 <= 14;
+    return `${count} ${teen ? "услуг" : last === 1 ? "услуга" : last >= 2 && last <= 4 ? "услуги" : "услуг"}`;
+}
 
 export async function mount(context) {
     ctx = context;
@@ -66,14 +67,14 @@ function renderGroupSections() {
                         data-drag-group-id="${section.id}" title="Перетащить группу" aria-label="Перетащить группу">☰</span>`}
                     <div class="admin-service-group-copy">
                         <h2>${ctx.ui.escapeHtml(section.name)}</h2>
-                        <span class="admin-service-group-count">${section.items.length} услуг</span>
+                        <span class="admin-service-group-count">${serviceCount(section.items.length)}</span>
                     </div>
                 </div>
                 ${section.isSystem ? "" : `
                     <div class="admin-service-group-actions">
                         ${ctx.ui.button("↑", {variant: "icon", action: "group-up", id: section.id, disabled: index === 0, title: "Группу выше"})}
                         ${ctx.ui.button("↓", {variant: "icon", action: "group-down", id: section.id, disabled: index === groups.length - 1, title: "Группу ниже"})}
-                        ${ctx.ui.button("Имя", {variant: "secondary", action: "rename-group", id: section.id})}
+                        ${ctx.ui.button("Переименовать", {variant: "secondary", action: "rename-group", id: section.id})}
                         ${ctx.ui.button("Удалить", {variant: "danger", action: "delete-group", id: section.id})}
                     </div>
                 `}
@@ -93,10 +94,10 @@ function renderServiceCard(service) {
     return `
         <div class="admin-service-item" draggable="true" data-service-id="${service.id}">
             <span class="admin-drag-handle" title="Перетащить">☰</span>
-            <strong>${ctx.ui.escapeHtml(service.name)}</strong>
+            <div class="admin-service-copy"><strong>${ctx.ui.escapeHtml(service.name)}</strong>
+                <small>${terminalLabel} · ${service.operator_choice_enabled ? "С выбором оператора" : "Без выбора оператора"}</small>
+            </div>
             ${ctx.ui.badge(availabilityLabel, service.status === "active" ? "success" : "neutral")}
-            ${ctx.ui.badge(terminalLabel, service.visible_on_terminal ? "success" : "warning")}
-            <span>${service.operator_choice_enabled ? "Выбор: да" : "Выбор: нет"}</span>
             <span class="admin-service-actions">${ctx.ui.button("Редактировать", {variant: "link", action: "edit", id: service.id})}</span>
         </div>
     `;
@@ -183,6 +184,7 @@ async function saveNewService(dialog) {
     dialog.close();
     await load();
     render();
+    ctx.view.querySelector('[data-action="create-service"]')?.focus();
     ctx.toast("Услуга добавлена", "success");
 }
 
@@ -220,6 +222,7 @@ async function saveNewGroup(dialog) {
     dialog.close();
     await load();
     render();
+    ctx.view.querySelector('[data-action="create-group"]')?.focus();
     ctx.toast("Группа добавлена", "success");
 }
 
@@ -229,7 +232,7 @@ function openServiceDrawer(service = null) {
         <form id="service-form" class="admin-form">
             ${ctx.ui.field("Название", ctx.ui.input("name", service?.name || "", "required"))}
             ${ctx.ui.field("Группа", ctx.ui.select("service_group_id", groupOptions(service?.service_group_id), service?.service_group_id ?? ""))}
-            ${isEdit ? ctx.ui.field("Статус", ctx.ui.select("status", statusOptions, service.status)) : ""}
+            ${isEdit ? ctx.ui.field("Услуга предоставляется", ctx.ui.switchField("status_active", service.status === "active")) : ""}
             ${ctx.ui.field("Показывать на терминале", ctx.ui.switchField("visible_on_terminal", service?.visible_on_terminal ?? true))}
             ${ctx.ui.field("Выбор оператора", ctx.ui.switchField("operator_choice_enabled", service?.operator_choice_enabled ?? false))}
             <div data-operator-choice-options>
@@ -267,6 +270,19 @@ async function handleDrawerClick(event) {
 }
 
 async function saveService(id) {
+    const saveButton = document.querySelector('[data-action="save-service"]');
+    if (saveButton?.disabled) return;
+    if (saveButton) saveButton.disabled = true;
+    try {
+        await persistService(id);
+    } catch (error) {
+        if (error?.name !== "ApiError") ctx.toast("Не удалось сохранить услугу. Попробуйте ещё раз", "error");
+    } finally {
+        if (saveButton?.isConnected) saveButton.disabled = false;
+    }
+}
+
+async function persistService(id) {
     const form = document.getElementById("service-form");
     const data = Object.fromEntries(new FormData(form).entries());
     const name = data.name?.trim();
@@ -285,13 +301,13 @@ async function saveService(id) {
             }
         });
     } else {
-        await ctx.api.json(`/services/${id}`, {method: "PATCH", body: {name}});
-        await ctx.api.json(`/services/${id}/group`, {method: "PATCH", body: {service_group_id}});
-        await ctx.api.json(`/services/${id}/status`, {method: "PATCH", body: {status: data.status}});
-        await ctx.api.json(`/services/${id}/terminal-visibility`, {method: "PATCH", body: {visible_on_terminal: Boolean(data.visible_on_terminal)}});
-        await ctx.api.json(`/services/${id}/operator-choice`, {
+        await ctx.api.json(`/services/${id}`, {
             method: "PATCH",
             body: {
+                name,
+                service_group_id,
+                status: data.status_active ? "active" : "inactive",
+                visible_on_terminal: Boolean(data.visible_on_terminal),
                 operator_choice_enabled: Boolean(data.operator_choice_enabled),
                 operator_choice_allow_break: Boolean(data.operator_choice_allow_break),
                 operator_choice_allow_offline: Boolean(data.operator_choice_allow_offline)
@@ -302,6 +318,7 @@ async function saveService(id) {
     ctx.closeDrawer();
     await load();
     render();
+    ctx.view.querySelector(`[data-service-id="${id}"] [data-action="edit"]`)?.focus();
     ctx.toast("Услуга сохранена", "success");
 }
 

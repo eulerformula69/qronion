@@ -5,7 +5,13 @@ from pydantic import BaseModel, Field, validator
 
 
 class ServiceRename(BaseModel):
-    name: str
+    name: str = Field(min_length=1)
+    service_group_id: int | None = None
+    status: Literal["active", "inactive"] | None = None
+    visible_on_terminal: bool | None = None
+    operator_choice_enabled: bool | None = None
+    operator_choice_allow_break: bool | None = None
+    operator_choice_allow_offline: bool | None = None
 
 
 class OperatorWindowUpdate(BaseModel):

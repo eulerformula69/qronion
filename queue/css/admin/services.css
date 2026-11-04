@@ -109,7 +109,7 @@ body.admin-page .admin-service-dropzone:has(.admin-service-item) .admin-service-
 
 body.admin-page .admin-service-sort-row {
     display: grid;
-    grid-template-columns: 34px minmax(260px, 1fr) 165px 215px 120px 140px;
+    grid-template-columns: 24px minmax(180px, 1fr) 165px 140px;
     align-items: center;
     gap: 14px;
     min-height: 42px;
@@ -123,7 +123,7 @@ body.admin-page .admin-service-sort-row {
 
 body.admin-page .admin-service-item {
     display: grid;
-    grid-template-columns: 34px minmax(260px, 1fr) 165px 215px 120px 140px;
+    grid-template-columns: 24px minmax(180px, 1fr) 165px 140px;
     align-items: center;
     gap: 14px;
     min-height: 58px;
@@ -299,3 +299,11 @@ body.admin-page .admin-service-item .admin-badge{
 body.admin-page .admin-service-item .admin-badge-success{ color: #326344; }
 body.admin-page .admin-service-item .admin-badge-warning,
 body.admin-page .admin-service-item .admin-badge-neutral{ color: var(--text-muted); }
+
+body.admin-page .admin-service-copy{ min-width: 0; }
+body.admin-page .admin-service-copy small{ display: block; margin-top: 6px; color: var(--text-muted); font-size: 13px; line-height: 1.4; }
+@media (max-width: 1000px){
+    body.admin-page .admin-service-item{ grid-template-columns: 24px minmax(0, 1fr) auto; }
+    body.admin-page .admin-service-item > .admin-badge{ grid-column: 2; grid-row: 2; }
+    body.admin-page .admin-service-actions{ grid-column: 3; grid-row: 1 / 3; }
+}

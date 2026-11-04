@@ -218,7 +218,10 @@ function getView() {
     return document.getElementById("admin-view");
 }
 
+let drawerTrigger = null;
+
 function openDrawer(title, content, options = {}) {
+    drawerTrigger = document.activeElement;
     const drawer = document.getElementById("admin-drawer");
     drawer.innerHTML = `
         <div class="admin-drawer-header">
@@ -230,6 +233,12 @@ function openDrawer(title, content, options = {}) {
     `;
     drawer.classList.add("open");
     drawer.setAttribute("aria-hidden", "false");
+    drawer.setAttribute("role", "dialog");
+    drawer.setAttribute("aria-label", title);
+    (drawer.querySelector("input, select, textarea") || drawer.querySelector("button"))?.focus();
+    drawer.onkeydown = event => {
+        if (event.key === "Escape") { event.preventDefault(); closeDrawer(); }
+    };
     drawer.querySelector('[data-action="close-drawer"]')?.addEventListener("click", closeDrawer);
 }
 
@@ -238,6 +247,8 @@ function closeDrawer() {
     drawer.classList.remove("open");
     drawer.setAttribute("aria-hidden", "true");
     drawer.innerHTML = "";
+    if (drawerTrigger?.isConnected) drawerTrigger.focus();
+    drawerTrigger = null;
 }
 
 async function navigate() {
