@@ -12,7 +12,9 @@ body.board-page[data-board-profile="default"] h1{
     text-align: center;
 }
 body.board-page[data-board-profile="default"] .clock-container{
-    margin-bottom: 12px;
+    margin: 0 32px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #dce4e6;
     font-size: 24px;
     font-weight: 500;
     line-height: 1.3;
