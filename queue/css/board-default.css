@@ -1,14 +1,14 @@
 /* Only the main board profile uses this treatment. */
 body.board-page[data-board-profile="default"]{
     background: #fff;
-    color: #173037;
+    color: #1b3a42;
 }
 body.board-page[data-board-profile="default"] h1{
     margin: 20px 24px 8px;
     font-size: 32px;
     font-weight: 700;
     line-height: 1.3;
-    color: #173037;
+    color: #1b3a42;
     text-align: center;
 }
 body.board-page[data-board-profile="default"] .clock-container{
@@ -16,7 +16,7 @@ body.board-page[data-board-profile="default"] .clock-container{
     font-size: 24px;
     font-weight: 500;
     line-height: 1.3;
-    color: #173037;
+    color: #1b3a42;
     font-variant-numeric: tabular-nums;
 }
 body.board-page[data-board-profile="default"] .board-wrapper-with-waiting{
@@ -29,7 +29,7 @@ body.board-page[data-board-profile="default"] .board-section-header{
     min-height: 48px;
     margin-bottom: 16px;
     padding: 0;
-    color: #173037;
+    color: #1b3a42;
     font-size: 28px;
     font-weight: 700;
     line-height: 1.3;
@@ -69,7 +69,7 @@ body.board-page[data-board-profile="default"] .board-ticker{
     box-sizing: border-box;
     border-top: 4px solid #b94b16;
     background: #eaf0f1;
-    color: #173037;
+    color: #1b3a42;
 }
 body.board-page[data-board-profile="default"] .board-ticker__text--system{ color: #806000; }
 body.board-page[data-board-profile="default"] .board-ticker__text::after{ color: #53646b; }
