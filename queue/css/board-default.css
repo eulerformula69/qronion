@@ -1,0 +1,85 @@
+/* Only the main board profile uses this treatment. */
+body.board-page[data-board-profile="default"]{
+    background: #fff;
+    color: #173037;
+}
+body.board-page[data-board-profile="default"] h1{
+    margin: 20px 24px 8px;
+    font-size: 32px;
+    color: #173037;
+    text-align: center;
+}
+body.board-page[data-board-profile="default"] .clock-container{
+    margin-bottom: 12px;
+    font-size: 28px;
+    color: #36464d;
+    font-variant-numeric: tabular-nums;
+}
+body.board-page[data-board-profile="default"] .board-wrapper-with-waiting{
+    height: calc(100vh - 128px - var(--board-ticker-offset));
+    padding: 16px 32px 24px;
+    gap: 32px;
+}
+body.board-page[data-board-profile="default"] .board-section-header{
+    height: auto;
+    min-height: 48px;
+    margin-bottom: 16px;
+    padding: 0;
+    color: #173037;
+    font-size: 28px;
+    text-transform: none;
+}
+body.board-page[data-board-profile="default"] .board-section-waiting{
+    border-right: 1px solid #dce4e6;
+    padding-right: 28px;
+}
+body.board-page[data-board-profile="default"] .board-section-called .board{
+    gap: 0 32px;
+}
+body.board-page[data-board-profile="default"] .waiting-board{ gap: 0; }
+body.board-page[data-board-profile="default"] .board-section-called .card,
+body.board-page[data-board-profile="default"] .waiting-card{
+    border: 0;
+    border-bottom: 1px solid #dce4e6;
+    border-radius: 0;
+    padding: 12px 0;
+    box-shadow: none;
+    background: #fff;
+    transition: none;
+}
+body.board-page[data-board-profile="default"] .board-section-called .ticket,
+body.board-page[data-board-profile="default"] .waiting-card .ticket{
+    color: #0c4f57;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+body.board-page[data-board-profile="default"] .board-section-called .window{
+    color: #a74715;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+body.board-page[data-board-profile="default"] .board-section-called .arrow{ color: #6b7c82; opacity: 1; }
+body.board-page[data-board-profile="default"] .board-ticker{
+    box-sizing: border-box;
+    border-top: 4px solid #b94b16;
+    background: #eaf0f1;
+    color: #173037;
+}
+body.board-page[data-board-profile="default"] .board-ticker__text--system{ color: #806000; }
+body.board-page[data-board-profile="default"] .board-ticker__text::after{ color: #53646b; }
+body.board-page[data-board-profile="default"] .board-page-dot.active{ background: #0c4f57; }
+@keyframes main-board-call{
+    0%, 40%, 100%{ background: #fff; }
+    20%, 60%{ background: #ffe4cb; }
+}
+body.board-page[data-board-profile="default"] .board-section-called .calling{
+    animation: main-board-call 1.5s ease-in-out;
+    border: 0;
+    border-bottom: 1px solid #dce4e6;
+}
+@media (max-width: 1100px){
+    body.board-page[data-board-profile="default"] .board-section-waiting{ border-right: 0; padding-right: 0; }
+}
+@media (prefers-reduced-motion: reduce){
+    body.board-page[data-board-profile="default"] .board-section-called .calling{ animation: none; }
+}
