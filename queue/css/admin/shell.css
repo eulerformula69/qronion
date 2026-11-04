@@ -4,6 +4,14 @@ html.admin-document {
 }
 
 body.admin-page {
+    --primary: #0c4f57;
+    --primary-hover: #054b54;
+    --accent: #087582;
+    --button-action: #b94b16;
+    --text-main: #1b3a42;
+    --text-muted: #61737a;
+    --bg: #f4f6f6;
+    --shadow: 0 2px 6px rgba(0, 0, 0, .04);
     --admin-border: color-mix(in srgb, var(--primary) 12%, transparent);
     --admin-border-strong: color-mix(in srgb, var(--primary) 18%, transparent);
     --admin-soft-bg: color-mix(in srgb, var(--primary) 4%, var(--card-bg));
@@ -50,7 +58,7 @@ body.admin-page .admin-sidebar {
     display: flex;
     flex-direction: column;
     height: 100dvh;
-    background: linear-gradient(180deg, var(--primary-hover) 0%, var(--primary) 100%);
+    background: var(--primary);
     color: var(--card-bg);
     border-right: 1px solid var(--admin-sidebar-line);
 }
@@ -79,10 +87,10 @@ body.admin-page .admin-sidebar-header .admin-menu-button {
 body.admin-page .admin-nav-group {
     margin: 16px 14px 4px;
     color: color-mix(in srgb, var(--card-bg) 52%, transparent);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .08em;
-    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 body.admin-page .admin-nav-group:first-child {
@@ -125,7 +133,7 @@ body.admin-page .admin-nav-link.active {
 }
 
 body.admin-page .admin-nav-link.active {
-    box-shadow: inset 3px 0 var(--accent);
+    box-shadow: inset 3px 0 #e78247;
 }
 
 body.admin-page .admin-sidebar-user {
@@ -479,12 +487,12 @@ body.admin-page a.admin-btn {
 
 body.admin-page button.admin-btn:hover,
 body.admin-page a.admin-btn:hover {
-    transform: translateY(-1px);
+    transform: none;
 }
 
 body.admin-page button.admin-btn-primary,
 body.admin-page a.admin-btn-primary {
-    background: var(--primary);
+    background: var(--button-action);
     color: var(--card-bg);
 }
 

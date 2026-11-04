@@ -15,14 +15,14 @@ body.admin-page .admin-list-row {
 
 body.admin-page .admin-service-board {
     display: grid;
-    gap: 18px;
+    gap: 24px;
 }
 
 body.admin-page .admin-service-group {
     background: var(--card-bg);
     border: 1px solid var(--admin-border);
-    border-radius: 8px;
-    box-shadow: var(--shadow);
+    border-radius: 12px;
+    box-shadow: none;
     overflow: hidden;
 }
 
@@ -32,7 +32,7 @@ body.admin-page .admin-service-group-header {
     justify-content: space-between;
     gap: 16px;
     min-height: 68px;
-    padding: 14px 18px;
+    padding: 20px;
     background: var(--admin-soft-bg);
     border-bottom: 1px solid var(--admin-border);
 }
@@ -97,8 +97,8 @@ body.admin-page .admin-service-dropzone {
 body.admin-page .admin-service-empty {
     display: flex;
     align-items: center;
-    min-height: 58px;
-    padding: 0 18px;
+    min-height: 72px;
+    padding: 12px 20px;
     color: var(--text-muted);
     background: color-mix(in srgb, var(--bg) 65%, var(--card-bg));
 }
@@ -289,3 +289,13 @@ body.admin-page .admin-settings-wide {
     grid-column: 1 / -1;
 }
 
+
+body.admin-page .admin-service-item .admin-badge{
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    font-weight: 500;
+}
+body.admin-page .admin-service-item .admin-badge-success{ color: #326344; }
+body.admin-page .admin-service-item .admin-badge-warning,
+body.admin-page .admin-service-item .admin-badge-neutral{ color: var(--text-muted); }

@@ -28,7 +28,7 @@ function render() {
     ctx.view.innerHTML = `
         <div class="admin-toolbar">
             ${ctx.ui.button("Добавить услугу", {variant: "primary", action: "create-service"})}
-            ${ctx.ui.button("Добавить группу", {variant: "primary", action: "create-group"})}
+            ${ctx.ui.button("Добавить группу", {variant: "secondary", action: "create-group"})}
         </div>
         <section class="admin-service-board">
             ${renderGroupSections()}
