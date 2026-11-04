@@ -89,7 +89,7 @@ body.operator-page .display-zone{
 }
 body.operator-page .current-client-panel{
     flex: 0 0 auto;
-    min-height: 232px;
+    min-height: 264px;
     width: 100%;
     display: flex;
     flex-direction: column;
