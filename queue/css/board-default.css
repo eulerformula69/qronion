@@ -77,13 +77,18 @@ body.board-page[data-board-profile="default"] .board-ticker__text--system{ color
 body.board-page[data-board-profile="default"] .board-ticker__text::after{ color: #53646b; }
 body.board-page[data-board-profile="default"] .board-page-dot.active{ background: #087582; }
 @keyframes main-board-call{
-    0%, 40%, 100%{ background: #fff; }
-    20%, 60%{ background: #ffe4cb; }
+    0%, 40%, 100%{ background: #fff; color: #087582; }
+    20%, 60%{ background: #b94b16; color: #fff; }
 }
 body.board-page[data-board-profile="default"] .board-section-called .calling{
     animation: main-board-call 1.5s ease-in-out;
     border: 0;
     border-bottom: 1px solid #dce4e6;
+}
+body.board-page[data-board-profile="default"] .board-section-called .calling .ticket,
+body.board-page[data-board-profile="default"] .board-section-called .calling .window,
+body.board-page[data-board-profile="default"] .board-section-called .calling .arrow{
+    color: inherit;
 }
 @media (max-width: 1100px){
     body.board-page[data-board-profile="default"] .board-section-waiting{ border-right: 0; padding-right: 0; }
