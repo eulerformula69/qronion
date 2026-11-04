@@ -1,6 +1,6 @@
 /* ===== operator.css ===== */
 body.operator-page h3{
-    color: var(--primary);       /* Заголовки теперь синие */
+    color: var(--primary);
     font-weight: 500;
     text-transform: none;
     letter-spacing: 0;
@@ -8,6 +8,15 @@ body.operator-page h3{
 }
 
 body.operator-page{
+    --primary: #065863;
+    --primary-hover: #054b54;
+    --accent: #138c9d;
+    --operator-selection: #d8eaed;
+    --button-action: #b94b16;
+    --button-action-hover: #9f3f12;
+    --text-main: #20383c;
+    --bg: #f7f7f7;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     margin: 0;
     font-family: 'Inter', -apple-system, sans-serif;
     background-color: var(--bg);
@@ -206,6 +215,8 @@ body.operator-page button:not(:disabled):active{
 }
 body.operator-page .btn-primary{ background: var(--primary); color: white; }
 body.operator-page .btn-primary:hover{ background: var(--primary-hover); }
+body.operator-page .primary-actions .btn-primary{ background: var(--button-action); }
+body.operator-page .primary-actions .btn-primary:hover{ background: var(--button-action-hover); }
 body.operator-page .btn-success{ background: var(--success); color: white; }
 body.operator-page .btn-danger{ background: var(--danger); color: white; }
 body.operator-page .btn-danger-outline{
@@ -685,7 +696,7 @@ body.operator-page .auto-call-container{
 body.operator-page .auto-call-label{
     font-size: 1.1rem;
     font-weight: 500;
-    color: var(--primary);  /* Используем ваш темно-синий цвет */
+    color: var(--primary);
     text-transform: none;
     letter-spacing: 0;
 }
@@ -945,7 +956,7 @@ body.operator-page .redirect-option {
 
 body.operator-page .redirect-option.selected {
     border-color: var(--primary);
-    background: #edf6ff;
+    background: var(--operator-selection);
     box-shadow: inset 0 0 0 1px var(--primary);
 }
 
@@ -1056,7 +1067,7 @@ body.operator-page .queue-column{
 
 body.operator-page .queue-column.active{
     border-color: var(--primary);
-    background: #edf6ff;
+    background: var(--operator-selection);
     box-shadow: inset 0 0 0 1px var(--primary);
 }
 
