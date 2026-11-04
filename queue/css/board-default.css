@@ -49,12 +49,12 @@ body.board-page[data-board-profile="default"] .waiting-card{
 }
 body.board-page[data-board-profile="default"] .board-section-called .ticket,
 body.board-page[data-board-profile="default"] .waiting-card .ticket{
-    color: #0c4f57;
+    color: #087582;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
 }
 body.board-page[data-board-profile="default"] .board-section-called .window{
-    color: #a74715;
+    color: #c65316;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
 }
@@ -67,7 +67,7 @@ body.board-page[data-board-profile="default"] .board-ticker{
 }
 body.board-page[data-board-profile="default"] .board-ticker__text--system{ color: #806000; }
 body.board-page[data-board-profile="default"] .board-ticker__text::after{ color: #53646b; }
-body.board-page[data-board-profile="default"] .board-page-dot.active{ background: #0c4f57; }
+body.board-page[data-board-profile="default"] .board-page-dot.active{ background: #087582; }
 @keyframes main-board-call{
     0%, 40%, 100%{ background: #fff; }
     20%, 60%{ background: #ffe4cb; }
