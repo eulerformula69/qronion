@@ -1,11 +1,9 @@
 /* LG webOS watchdog for the lite2 board page.
    Older TV WebViews can stop repainting HTML overlays after long playback.
-   Keep the DOM changing and refresh the page before that state usually starts. */
+   Keep the DOM changing and recover paused playback without reloading the page. */
 (function () {
     var REPAINT_INTERVAL_MS = 10000;
     var VIDEO_CHECK_INTERVAL_MS = 30000;
-    var HARD_RELOAD_AFTER_MS = 10 * 60 * 1000;
-    var startedAt = new Date().getTime();
     var repaintTick = 0;
     var screenWakeLock = null;
 
@@ -95,16 +93,6 @@
         } catch (e) {}
     }
 
-    function hardReloadBeforeWebOsStalls() {
-        var url;
-
-        if (window.BOARD_DISABLE_FORCED_RELOAD) return;
-        if (new Date().getTime() - startedAt < HARD_RELOAD_AFTER_MS) return;
-
-        url = window.location.pathname + "?lgLiteReload=" + new Date().getTime();
-        window.location.replace(url);
-    }
-
     function init() {
         repaintInterface();
         keepVideoPlaying();
@@ -112,7 +100,6 @@
 
         setInterval(repaintInterface, REPAINT_INTERVAL_MS);
         setInterval(keepVideoPlaying, VIDEO_CHECK_INTERVAL_MS);
-        setInterval(hardReloadBeforeWebOsStalls, 30000);
 
         document.addEventListener("visibilitychange", function () {
             if (!document.hidden) {

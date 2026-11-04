@@ -459,20 +459,7 @@ body.board-page[data-board-profile="media"] .media-panel video{
     background: #f9f9f9;
 }
 
-body.board-page[data-board-profile="media"] .media-reload-timer{
-    flex: 0 0 auto;
-    align-self: stretch;
-    margin-top: 3px;
-    padding: 2px 8px;
-    border-radius: 5px;
-    background: rgba(90, 96, 106, 0.12);
-    color: rgba(70, 76, 86, 0.62);
-    font: 500 11px/1.2 Arial, sans-serif;
-    font-variant-numeric: tabular-nums;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-}
+
 
 body.board-page[data-board-profile="media"] .board-ticker{
     height: 72px;

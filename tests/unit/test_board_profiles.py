@@ -96,29 +96,6 @@ def test_media_tts_uses_web_audio_without_stealing_the_video_element():
     assert "new Audio()" not in source
 
 
-def test_media_reload_waits_for_video_end_and_resumes_with_next_video():
-    source = _read("queue/js/media-lite.js")
-
-    ended_index = source.index('video.addEventListener("ended"')
-    planned_reload_index = source.index(
-        "new Date().getTime() - startedAt >= RELOAD_ON_VIDEO_END_AFTER_MS",
-        ended_index,
-    )
-
-    assert "RELOAD_ON_VIDEO_END_AFTER_MS = 5 * 60 * 1000" in source
-    assert planned_reload_index > ended_index
-    assert "rememberNextVideo(currentPlaylist[playlistIndex])" in source
-    assert 'window.sessionStorage.setItem(NEXT_VIDEO_STORAGE_KEY, path)' in source
-    assert "takeRememberedVideo()" in source
-    assert "setTimeout(hardReloadWhenSafe, HARD_RELOAD_AFTER_MS)" in source
-    assert "HARD_RELOAD_AFTER_MS = 60 * 60 * 1000" in source
-    assert 'document.getElementById("media-reload-timer")' in source
-    assert '"Перезапуск: после видео и озвучки"' in source
-    assert "canReloadSafely()" in source
-    assert "tts.isBusy && tts.isBusy()" in source
-    assert "window.prepareMediaBoardReload()" in source
-
-
 def test_media_board_speaks_only_explicit_call_events_with_server_tts_text():
     source = _read("queue/js/board-lite.js")
 
@@ -127,24 +104,10 @@ def test_media_board_speaks_only_explicit_call_events_with_server_tts_text():
     handle_state = source[handle_state_start:handle_recall_start]
     handle_recall = source[handle_recall_start:]
 
-    assert "if (reloadCallKeys)" in handle_state
-    assert "if (!known[getTicketCallKey(called[i])])" in handle_state
+    assert "announceTicket(" not in handle_state
     assert "announceTicket(ticket)" in handle_recall
     assert 'tts_text: data.tts_text || srcTicket.tts_text || ""' in handle_recall
     assert "detectAndAnnounceNewTickets" not in source
-
-
-def test_media_reload_recovers_calls_that_arrived_during_reload():
-    source = _read("queue/js/board-lite.js")
-    ticket_service = _read("app/services/tickets.py")
-
-    assert 'RELOAD_CALLS_STORAGE_KEY = "board-media-known-calls"' in source
-    assert "window.prepareMediaBoardReload = function ()" in source
-    assert "getTicketCallKey(previousCalledTickets[i])" in source
-    assert "if (!known[getTicketCallKey(called[i])])" in source
-    assert "announceTicket(called[i])" in source
-    assert '"tts_text": render_ticket_template(' in ticket_service
-    assert '"last_recalled_at": (' in ticket_service
 
 
 def test_board_popup_is_triggered_only_by_deduplicated_ticket_called_events_and_can_replace_highlight():

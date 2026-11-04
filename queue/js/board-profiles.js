@@ -64,7 +64,6 @@
             waitingPageSize: profile.waitingPageSize,
             pageIntervalMs: profile.pageIntervalMs,
         };
-        window.BOARD_DISABLE_FORCED_RELOAD = true;
     }
 
     function setOptionalText(element, value) {

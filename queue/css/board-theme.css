@@ -126,3 +126,5 @@ body.board-page[data-board-profile="media"] .board-section-called .board,
 body.board-page[data-board-profile="media"] .waiting-board{ gap: 0; }
 body.board-page[data-board-profile="media"] .media-panel,
 body.board-page[data-board-profile="media"] .media-panel video{ background: #fff; }
+
+body.board-page[data-board-profile="media"] .clock-container{ border-bottom: 0; }

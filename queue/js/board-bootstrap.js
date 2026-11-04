@@ -51,7 +51,6 @@
     if (isMedia) {
         document.body.setAttribute("data-board-profile", "media");
         document.body.className += " board-media-page";
-        window.BOARD_DISABLE_FORCED_RELOAD = true;
         window.BOARD_CONFIG = {
             calledPageSize: 5,
             waitingPageSize: 5,
