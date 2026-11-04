@@ -12,6 +12,8 @@ body.operator-page{
     --primary-hover: #054b54;
     --accent: #138c9d;
     --operator-selection: #d8eaed;
+    --control-border: #cbd5d7;
+    --control-radius: 8px;
     --button-action: #b94b16;
     --button-action-hover: #9f3f12;
     --text-main: #20383c;
@@ -204,7 +206,7 @@ body.operator-page #queue-panel{
 body.operator-page button{
     border: none;
     padding: 12px 20px;
-    border-radius: 10px;
+    border-radius: var(--control-radius);
     font-weight: 600;
     cursor: pointer;
     transition: transform 100ms ease-out, background-color 160ms ease, color 160ms ease, opacity 160ms ease;
@@ -214,9 +216,9 @@ body.operator-page button:not(:disabled):active{
     transform: scale(0.98);
 }
 body.operator-page .btn-primary{ background: var(--primary); color: white; }
-body.operator-page .btn-primary:hover{ background: var(--primary-hover); }
+body.operator-page .btn-primary:not(:disabled):hover{ background: var(--primary-hover); }
 body.operator-page .primary-actions .btn-primary{ background: var(--button-action); }
-body.operator-page .primary-actions .btn-primary:hover{ background: var(--button-action-hover); }
+body.operator-page .primary-actions .btn-primary:not(:disabled):hover{ background: var(--button-action-hover); }
 body.operator-page .btn-success{ background: var(--success); color: white; }
 body.operator-page .btn-danger{ background: var(--danger); color: white; }
 body.operator-page .btn-danger-outline{
@@ -454,15 +456,16 @@ body.operator-page .operator-popup-form label{
 body.operator-page .operator-popup-input{
     box-sizing: border-box;
     width: 100%;
-    padding: 11px 12px;
-    border: 1px solid #cbd5e1;
+    padding: 12px;
+    border: 1px solid var(--control-border);
     border-radius: 8px;
     color: var(--text-main);
     font: inherit;
 }
 body.operator-page .operator-popup-input:focus{
     border-color: var(--primary);
-    outline: 2px solid rgba(15, 76, 129, 0.14);
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 body.operator-page .operator-popup-error{
     min-height: 1.2em;
@@ -589,7 +592,7 @@ body.operator-page .window-status-switch input:checked + .window-status-switch-t
     transform: translateX(20px);
 }
 body.operator-page .window-status-switch input:focus-visible + .window-status-switch-track{
-    outline: 3px solid rgba(0, 51, 102, 0.24);
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
 body.operator-page .window-status-switch:has(input:disabled){
@@ -598,12 +601,26 @@ body.operator-page .window-status-switch:has(input:disabled){
 }
 body.operator-page .btn-outline{
     background: transparent;
-    border: 2px solid #e2e8f0;
+    border: 1px solid var(--control-border);
     color: var(--text-main);
 }
-body.operator-page .btn-outline:hover{ background: #f1f5f9; }
+body.operator-page .btn-outline:not(:disabled):hover{
+    background: var(--operator-selection);
+    border-color: var(--primary);
+}
+body.operator-page button:focus-visible,
+body.operator-page input:focus-visible,
+body.operator-page select:focus-visible,
+body.operator-page textarea:focus-visible{
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+body.operator-page input[type="checkbox"]{
+    accent-color: var(--primary);
+}
 body.operator-page button:disabled{
     cursor: not-allowed;
+    opacity: 0.45;
 }
 body.operator-page .current-ticket-actions-inactive [data-current-ticket-action],
 body.operator-page .current-ticket-action-inactive,
@@ -663,7 +680,7 @@ body.operator-page .dot{
 }
 body.operator-page .dot.online{
     background-color: var(--success) !important;
-    box-shadow: 0 0 8px var(--success);
+    box-shadow: none;
 }
 
 
