@@ -47,12 +47,12 @@ function render() {
     ctx.view.innerHTML = `
         <div class="workplaces-summary" aria-label="Состояние рабочих мест">
             ${summaryCard("Рабочих мест", windows.length)}
-            ${summaryCard("Занято", occupiedCount, "success")}
-            ${summaryCard("Свободно", windows.length - occupiedCount, "warning")}
-            ${summaryCard("Без назначения", freeOperators.length, freeOperators.length ? "warning" : "neutral")}
+            ${summaryCard("Мест с оператором", occupiedCount, "success")}
+            ${summaryCard("Мест без оператора", windows.length - occupiedCount, "warning")}
+            ${summaryCard("Операторы без места", freeOperators.length, freeOperators.length ? "warning" : "neutral")}
         </div>
         <div class="workplaces-toolbar">
-            <div>${ctx.ui.button("Добавить рабочее место", {variant: "primary", action: "create-window"})}${ctx.ui.button("Добавить оператора", {variant: "primary", action: "create-operator"})}</div>
+            <div>${ctx.ui.button("Добавить рабочее место", {variant: "primary", action: "create-window"})}${ctx.ui.button("Добавить оператора", {variant: "secondary", action: "create-operator"})}</div>
         </div>
         ${renderLinkedView()}`;
     ctx.view.onclick = handleClick;
@@ -64,13 +64,10 @@ function renderLinkedView() {
     return `<section class="workplaces-section" aria-labelledby="workplaces-title">
         <h2 id="workplaces-title">Назначения</h2>
         ${ctx.ui.table([
-            ctx.ui.sortHeader("ID места", "window_id", sortState),
             ctx.ui.sortHeader("Рабочее место", "window_name", sortState),
             ctx.ui.sortHeader("Статус", "status", sortState),
             ctx.ui.sortHeader("Услуги", "services", sortState),
-            ctx.ui.sortHeader("ID оператора", "operator_id", sortState),
             ctx.ui.sortHeader("Оператор", "operator_name", sortState),
-            ctx.ui.sortHeader("Логин", "login", sortState),
             "Действия"
         ], sortRows(rows).map(renderLinkedRow), {title: ""})}
     </section>`;
@@ -89,14 +86,11 @@ function buildLinkedRows() {
 function renderLinkedRow({windowItem, operator}) {
     const serviceNames = windowItem ? serviceNamesForWindow(windowItem.id) : [];
     return `<tr class="workplace-row">
-        <td class="workplace-id">${windowItem?.id ?? "—"}</td>
-        <td>${windowItem ? `<strong>${ctx.ui.escapeHtml(windowItem.name)}</strong>` : `<select class="admin-input workplace-assign-select" data-action="assign-window" data-operator-id="${operator.id}" aria-label="Назначить рабочее место оператору ${ctx.ui.escapeHtml(operator.name)}"><option value="">Не назначено</option>${freeWindowOptions()}</select>`}</td>
+        <td>${windowItem ? `<strong>${ctx.ui.escapeHtml(windowItem.name)}</strong><small class="workplace-meta">ID ${windowItem.id}</small>` : `<select class="admin-input workplace-assign-select" data-action="assign-window" data-operator-id="${operator.id}" aria-label="Назначить рабочее место оператору ${ctx.ui.escapeHtml(operator.name)}"><option value="">Не назначено</option>${freeWindowOptions()}</select>`}</td>
         <td>${windowItem ? ctx.ui.badge(statusLabel(windowItem.status), statusTone(windowItem.status)) : "—"}</td>
         <td class="workplace-services" title="${ctx.ui.escapeHtml(serviceNames.join(", "))}">${windowItem ? (serviceNames.length ? ctx.ui.escapeHtml(serviceNames.join(", ")) : "Не назначены") : "—"}</td>
-        <td class="workplace-id">${operator?.id ?? "—"}</td>
-        <td>${operator ? `<strong>${ctx.ui.escapeHtml(operator.name)}</strong>` : `<select class="admin-input workplace-assign-select" data-action="assign" data-window-id="${windowItem.id}" aria-label="Назначить оператора на ${ctx.ui.escapeHtml(windowItem.name)}"><option value="">Не назначен</option>${freeOperatorOptions()}</select>`}</td>
-        <td>${ctx.ui.escapeHtml(operator?.login || "—")}</td>
-        <td><div class="workplace-actions">${windowItem && operator ? ctx.ui.button("Снять", {variant: "ghost", action: "unassign", id: windowItem.id}) : ""}${operator ? ctx.ui.button("Оператор", {variant: "link", action: "edit-operator", id: operator.id}) : ""}${windowItem ? ctx.ui.button("Место", {variant: "link", action: "edit-window", id: windowItem.id}) : ""}</div></td>
+        <td>${operator ? `<strong>${ctx.ui.escapeHtml(operator.name)}</strong><small class="workplace-meta">${ctx.ui.escapeHtml(operator.login)} · ID ${operator.id}</small>` : `<select class="admin-input workplace-assign-select" data-action="assign" data-window-id="${windowItem.id}" aria-label="Назначить оператора на ${ctx.ui.escapeHtml(windowItem.name)}"><option value="">Не назначен</option>${freeOperatorOptions()}</select>`}</td>
+        <td><div class="workplace-actions">${windowItem && operator ? ctx.ui.button("Снять назначение", {variant: "ghost", action: "unassign", id: windowItem.id}) : ""}${operator ? ctx.ui.button("Изменить оператора", {variant: "link", action: "edit-operator", id: operator.id}) : ""}${windowItem ? ctx.ui.button("Настроить место", {variant: "link", action: "edit-window", id: windowItem.id}) : ""}</div></td>
     </tr>`;
 }
 
@@ -168,10 +162,18 @@ function statusTone(status) {
 }
 
 async function handleChange(event) {
-    if (!event.target.value) return;
-    event.target.disabled = true;
-    if (event.target.dataset.action === "assign") await assignOperator(Number(event.target.dataset.windowId), Number(event.target.value));
-    if (event.target.dataset.action === "assign-window") await assignOperator(Number(event.target.value), Number(event.target.dataset.operatorId));
+    const select = event.target;
+    if (!select.value || !["assign", "assign-window"].includes(select.dataset.action)) return;
+    select.disabled = true;
+    try {
+        if (select.dataset.action === "assign") await assignOperator(Number(select.dataset.windowId), Number(select.value));
+        else await assignOperator(Number(select.value), Number(select.dataset.operatorId));
+    } catch (error) {
+        select.value = "";
+        if (error?.name !== "ApiError") ctx.toast("Не удалось назначить оператора. Попробуйте ещё раз", "error");
+    } finally {
+        if (select.isConnected) select.disabled = false;
+    }
 }
 
 async function handleClick(event) {
@@ -201,7 +203,7 @@ function openWindowDrawer(windowItem = null) {
     ctx.openDrawer(windowItem ? "Настроить рабочее место" : "Новое рабочее место", `<form id="window-form" class="admin-form">
         ${ctx.ui.field("Название", ctx.ui.input("name", windowItem?.name || "", "required"))}
         ${windowItem ? ctx.ui.field("Состояние", ctx.ui.select("status", statuses, windowItem.status)) : ""}
-        ${windowItem ? `<section class="admin-subsection"><h3>Услуги</h3><p class="admin-muted">Меньшее число означает больший приоритет.</p><div class="admin-check-list">${services.map(service => { const checked = priorities.has(service.id); return `<label class="admin-check-row"><input type="checkbox" name="service_${service.id}" ${checked ? "checked" : ""}><span>${ctx.ui.escapeHtml(service.name)}</span><input class="admin-input admin-priority-input" type="number" min="1" max="100" name="priority_${service.id}" value="${priorities.get(service.id) || 1}"></label>`; }).join("")}</div></section>` : ""}
+        ${windowItem ? `<section class="admin-subsection"><h3>Услуги</h3><p class="admin-muted">Меньшее число означает больший приоритет.</p><div class="admin-check-list">${services.map(service => { const checked = priorities.has(service.id); return `<label class="admin-check-row"><input type="checkbox" name="service_${service.id}" ${checked ? "checked" : ""}><span>${ctx.ui.escapeHtml(service.name)}</span><input class="admin-input admin-priority-input" type="number" min="1" max="100" aria-label="Приоритет услуги ${ctx.ui.escapeHtml(service.name)}" name="priority_${service.id}" value="${priorities.get(service.id) || 1}"></label>`; }).join("")}</div></section>` : ""}
     </form>`, {footer: drawerFooter("window", windowItem?.id)});
     document.getElementById("admin-drawer").onclick = handleDrawerClick;
 }
@@ -227,7 +229,13 @@ async function handleDrawerClick(event) {
     if (!button) return;
     const id = Number(button.dataset.id) || null;
     if (button.dataset.action === "cancel") ctx.closeDrawer();
-    if (button.dataset.action === "save-window") await saveWindow(id);
+    if (button.dataset.action === "save-window") {
+        if (button.disabled) return;
+        button.disabled = true;
+        try { await saveWindow(id); }
+        catch (error) { if (error?.name !== "ApiError") ctx.toast("Не удалось сохранить рабочее место. Попробуйте ещё раз", "error"); }
+        finally { if (button.isConnected) button.disabled = false; }
+    }
     if (button.dataset.action === "delete-window") await deleteWindow(id);
     if (button.dataset.action === "save-operator") await saveOperator(id);
     if (button.dataset.action === "delete-operator") await deleteOperator(id);
@@ -239,10 +247,9 @@ async function saveWindow(id) {
     if (!name) return ctx.toast("Введите название рабочего места", "error");
     if (!id) await ctx.api.json("/windows/", {method: "POST", body: {name}});
     else {
-        await ctx.api.json(`/windows/${id}`, {method: "PATCH", body: {name}});
-        await ctx.api.json(`/windows/${id}/status`, {method: "PATCH", body: {status: data.status}});
-        const linked = services.filter(service => data[`service_${service.id}`]).map(service => ({service_id: service.id, priority: Math.max(1, Math.min(100, Number(data[`priority_${service.id}`]) || 1))}));
-        await ctx.api.json(`/window-services/${id}`, {method: "PUT", body: {services: linked}});
+        const linked = services.filter(service => data[`service_${service.id}`]).map(service => ({service_id: service.id, priority: Number(data[`priority_${service.id}`])}));
+        if (linked.some(item => !Number.isInteger(item.priority) || item.priority < 1 || item.priority > 100)) return ctx.toast("Укажите целый приоритет от 1 до 100", "error");
+        await ctx.api.json(`/windows/${id}`, {method: "PATCH", body: {name, status: data.status, services: linked}});
     }
     await refresh("Рабочее место сохранено");
 }

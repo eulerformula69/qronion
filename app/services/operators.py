@@ -31,15 +31,17 @@ def resolve_operator_auto_call_enabled(
     return bool(global_enabled)
 
 
-def update_services_status_for_window(db: Session, window_id: int):
-    service_ids = [
-        row[0]
-        for row in db.query(WindowService.service_id)
-        .filter(WindowService.window_id == window_id)
-        .all()
-    ]
+def update_services_status_for_window(db: Session, window_id: int, *, commit=True, service_ids=None):
+    if service_ids is None:
+        service_ids = [
+            row[0]
+            for row in db.query(WindowService.service_id)
+            .filter(WindowService.window_id == window_id)
+            .all()
+        ]
     if not service_ids:
-        db.commit()
+        if commit:
+            db.commit()
         return
 
     # Находим услуги, у которых есть хотя бы одно доступное окно, одним запросом.
@@ -80,7 +82,8 @@ def update_services_status_for_window(db: Session, window_id: int):
         if service.status != new_status:
             service.status = new_status
 
-    db.commit()
+    if commit:
+        db.commit()
 
 
 def get_operator_state(operator_id: int):

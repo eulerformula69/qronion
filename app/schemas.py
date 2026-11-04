@@ -207,6 +207,12 @@ class WindowServiceItem(BaseModel):
     priority: int
 
 
+class WindowUpdate(BaseModel):
+    name: str = Field(min_length=1)
+    status: Literal["online", "break", "offline"] | None = None
+    services: List[WindowServiceItem] | None = None
+
+
 class WindowServicesUpdate(BaseModel):
     services: List[WindowServiceItem]
 

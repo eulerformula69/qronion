@@ -34,9 +34,10 @@ from app.dependencies import (
 )
 from app.models import Admin, Operator, Service, Window, WindowService, record_operator_status
 from app.schemas import (
-    PriorityUpdate, WindowCreate, WindowServiceCreate, WindowServiceRead,
+    PriorityUpdate, WindowCreate, WindowUpdate, WindowServiceCreate, WindowServiceRead,
     WindowServicesUpdate, WindowStatusUpdate, WindowStatusUpdateOp,
 )
+from app.services.window_update import apply_window_update
 from app.security import get_password_hash, verify_password
 from app.services.operators import update_services_status_for_window
 
@@ -308,18 +309,20 @@ def delete_window(window_id: int, admin: Admin = Depends(verify_admin_session)):
 
 
 @router.patch("/windows/{window_id}", tags=["Windows"])
-async def rename_window(window_id: int, data: WindowCreate, admin: Admin = Depends(verify_admin_session)):
+async def rename_window(window_id: int, data: WindowUpdate, admin: Admin = Depends(verify_admin_session)):
     db = SessionLocal()
-    window = db.query(Window).filter(Window.id == window_id).first()
-    if not window:
+    try:
+        window = apply_window_update(db, window_id, data)
+        db.commit()
+        db.refresh(window)
+        result = {"id": window.id, "name": window.name, "status": window.status}
+    except Exception:
+        db.rollback()
+        raise
+    finally:
         db.close()
-        raise HTTPException(status_code=404, detail="Window not found")
-    window.name = data.name
-    db.commit()
-    db.refresh(window)
-    await manager.broadcast({"type": "services_updated", "target": "operator"})
-    db.close()
-    return window
+    await manager.broadcast({"type": "services_updated", "target": "operator", "window_id": window_id})
+    return result
 
 
 @router.patch("/window-services/priority", tags=["Windows"])

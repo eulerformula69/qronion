@@ -24,17 +24,14 @@ def test_workplaces_and_operators_share_one_operational_screen():
     assert 'action: "unassign"' in view_source
     assert 'class="workplace-row"' in view_source
     assert ".admin-table" in css_source
-    assert "min-width: 1280px" in css_source
-    assert "overflow-wrap: normal; white-space: nowrap;" in css_source
+    assert "min-width: 780px" in css_source
+    assert "white-space: normal;" in css_source
     assert 'button("Добавить оператор",' not in view_source
-    assert 'button("Добавить оператора", {variant: "primary"' in view_source
+    assert 'button("Добавить оператора", {variant: "secondary"' in view_source
     assert "показаны одним связанным списком" not in view_source
     assert "@media (max-width: 720px)" in css_source
-    assert 'ctx.ui.sortHeader("ID места", "window_id", sortState)' in view_source
     assert 'ctx.ui.sortHeader("Рабочее место", "window_name", sortState)' in view_source
-    assert 'ctx.ui.sortHeader("ID оператора", "operator_id", sortState)' in view_source
     assert 'ctx.ui.sortHeader("Оператор", "operator_name", sortState)' in view_source
-    assert 'ctx.ui.sortHeader("Логин", "login", sortState)' in view_source
     assert "function buildLinkedRows()" in view_source
     assert 'data-action="assign-window"' in view_source
 
@@ -71,11 +68,10 @@ def test_operator_admin_table_shows_visible_id_and_keeps_internal_id():
 def test_workplace_cards_show_ids_and_support_sorting():
     source = _read("queue/js/admin/views/windows.view.js")
 
-    assert 'class="workplace-id">${windowItem?.id ?? "—"}</td>' in source
+    assert 'class="workplace-meta">ID ${windowItem.id}</small>' in source
     assert 'data-window-id="${windowItem.id}"' in source
     assert 'action: "edit-window", id: windowItem.id' in source
     assert "windows.find(item => item.id === id)" in source
-    assert 'ctx.ui.sortHeader("ID места", "window_id", sortState)' in source
     assert 'ctx.ui.sortHeader("Рабочее место", "window_name", sortState)' in source
     assert 'ctx.ui.sortHeader("Статус", "status", sortState)' in source
     assert 'ctx.ui.sortHeader("Услуги", "services", sortState)' in source
