@@ -524,27 +524,6 @@ def test_lite_media_board_reserves_ticker_height():
     assert "overflow: hidden;" in lite_css
 
 
-def test_lite_media_pages_have_explicit_layout_zones_and_ticker():
-    lite_source = _read("queue/board-media-lite.html")
-    lite2_source = _read("queue/board-media-lite2.html")
-
-    for source in (lite_source, lite2_source):
-        assert '<header class="lite-header">' in source
-        assert '<main class="board-wrapper">' in source
-        assert '<div id="board-ticker" class="board-ticker" hidden>' in source
-        assert '<video id="media-video" autoplay playsinline></video>' in source
-        assert '<div class="waiting-board" id="waiting-board"></div>' in source
-        assert '<div class="board" id="board"></div>' in source
-
-
-def test_lite2_board_uses_smaller_page_sizes():
-    source = _read("queue/board-media-lite2.html")
-
-    assert '<body class="board-media-page lite-version lite2-version">' in source
-    assert "calledPageSize: 8," in source
-    assert "waitingPageSize: 8," in source
-
-
 def test_global_credentials_move_with_ticker_offset():
     source = _read("queue/css/base.css")
 

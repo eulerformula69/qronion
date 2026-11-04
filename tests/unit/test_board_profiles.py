@@ -38,7 +38,6 @@ def test_media_screen_uses_standard_board_with_media_profile():
     page = _read("queue/board.html")
     profiles = _read("queue/js/board-profiles.js")
     bootstrap = _read("queue/js/board-bootstrap.js")
-    legacy_page = _read("queue/board-media-lite3.html")
 
     assert '<video id="media-video" autoplay playsinline></video>' in page
     assert 'media: {' in profiles
@@ -55,8 +54,6 @@ def test_media_screen_uses_standard_board_with_media_profile():
     assert 'loadScript("/queue/js/tts-lite.js?v=board-profile-7")' in bootstrap
     assert 'loadScript("/queue/js/board-lite.js?v=board-profile-7")' in bootstrap
     assert 'loadScript("/queue/js/board.js")' in bootstrap
-    assert 'params.set("screen", "media")' in legacy_page
-    assert "board-lite.js" not in legacy_page
 
 
 def test_media_profile_hides_ticket_and_operator_labels_in_cards():

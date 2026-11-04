@@ -635,7 +635,7 @@ printf '\n\033[1;32mУстановка завершена.\033[0m\n'
 printf 'HTTP:       http://%s/queue/login.html\n' "${SERVER_IP}"
 printf 'HTTPS:      https://%s/queue/login.html\n' "${SERVER_IP}"
 printf 'Терминал:   http://%s/queue/terminal.html\n' "${SERVER_IP}"
-printf 'Табло:      http://%s/queue/board-media.html\n' "${SERVER_IP}"
+printf 'Табло:      http://%s/queue/board.html?screen=media\n' "${SERVER_IP}"
 printf 'Статистика: https://%s/grafana/d/queue-statistics/queue-statistics\n' "${SERVER_IP}"
 if [[ -n "${INSTALL_USER}" && -n "${INSTALL_HOME}" ]]; then
     printf 'Проект:     %s (доступ для %s)\n' "${APP_DIR}" "${INSTALL_USER}"

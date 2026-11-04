@@ -19,11 +19,10 @@ def test_deferred_ticket_note_has_secondary_text_style():
     assert ".waiting-deferred-note" in source
 
 
-def test_media_profile_uses_standard_deferred_ticket_renderer():
-    script = (ROOT / "queue" / "js" / "board.js").read_text(encoding="utf-8")
-    page = (ROOT / "queue" / "board-media-lite3.html").read_text(encoding="utf-8")
+def test_media_profile_uses_lite_deferred_ticket_renderer():
+    script = (ROOT / "queue" / "js" / "board-lite.js").read_text(encoding="utf-8")
+    bootstrap = (ROOT / "queue" / "js" / "board-bootstrap.js").read_text(encoding="utf-8")
 
-    assert 't.status === "deferred"' in script
     assert "Отложен оператором" in script
-    assert "t.window_name" in script
-    assert 'params.set("screen", "media")' in page
+    assert 'screen === "media"' in bootstrap
+    assert '/queue/js/board-lite.js' in bootstrap

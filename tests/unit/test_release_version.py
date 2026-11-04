@@ -18,10 +18,6 @@ def test_changelog_update_button_only_loads_on_operator_page():
         "admin.html",
         "terminal.html",
         "board.html",
-        "board-media.html",
-        "board-media-lite.html",
-        "board-media-lite2.html",
-        "board-media-lite3.html",
     ]
 
     for page_name in pages_without_update_button:

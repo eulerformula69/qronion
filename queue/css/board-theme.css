@@ -71,11 +71,11 @@ body.board-page.board-styled .board-ticker{
     box-sizing: border-box;
     border-top: 4px solid #b94b16;
     height: 72px;
-    background: #1a1d23;
-    color: #fff;
+    background: #eaf0f1;
+    color: #1b3a42;
 }
-body.board-page.board-styled .board-ticker__text--system{ color: #ffd54a; }
-body.board-page.board-styled .board-ticker__text::after{ color: rgba(255, 255, 255, .82); margin-left: 88px; }
+body.board-page.board-styled .board-ticker__text--system{ color: #806000; }
+body.board-page.board-styled .board-ticker__text::after{ color: #53646b; margin-left: 88px; }
 body.board-page.board-styled .board-page-dot.active{ background: #087582; }
 @keyframes main-board-call{
     0%, 40%, 100%{ background: #fff; }

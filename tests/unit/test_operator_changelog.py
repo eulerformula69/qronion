@@ -17,11 +17,10 @@ def test_operator_page_loads_operator_changelog_only():
     assert 'id="app-update-notification"' not in operator_html
     assert operator_html.index('app-version.js') < operator_html.index('operator-changelog.js')
     assert 'onclick="openOperatorChangelogHistory()"' in operator_html
-    assert "ОБНОВЛЕНИЯ" in operator_html
+    assert "Обновления" in operator_html
 
     other_pages = [
         "queue/board.html",
-        "queue/board-media.html",
         "queue/terminal.html",
         "queue/admin.html",
     ]
