@@ -54,6 +54,9 @@ body.terminal-page .operator-choice-list{
     gap: 12px;
     min-height: 0;
     overflow-y: auto;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
     padding: 4px 8px 24px 4px;
     scrollbar-color: var(--primary) #edf2f3;
 }
@@ -70,7 +73,9 @@ body.terminal-page .operator-choice-card{
     text-align: left;
     color: var(--text-main);
     cursor: pointer;
-    touch-action: manipulation;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
 }
 body.terminal-page .operator-choice-details{
     display: flex;
