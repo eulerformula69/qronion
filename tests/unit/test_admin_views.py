@@ -112,7 +112,7 @@ def test_services_use_separate_short_create_dialogs_without_availability_dashboa
     source = _read("queue/js/admin/views/services.view.js")
 
     assert 'button("Добавить услугу", {variant: "primary", action: "create-service"})' in source
-    assert 'button("Добавить группу", {variant: "primary", action: "create-group"})' in source
+    assert 'button("Добавить группу", {variant: "secondary", action: "create-group"})' in source
     assert "function openCreateServiceDialog()" in source
     assert "function openCreateGroupDialog()" in source
     assert 'ctx.ui.select("service_group_id", groupOptions(), "")' in source
