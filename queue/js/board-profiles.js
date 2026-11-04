@@ -58,10 +58,6 @@
         const profile = getCurrentProfile();
 
         document.body.dataset.boardProfile = profile.name;
-        if (profile.name === "default") {
-            document.querySelector(".board-section-waiting .board-section-header span").textContent = "Ожидайте вызова";
-            document.querySelector(".board-section-called .board-section-header span").textContent = "Подойдите к окну";
-        }
         document.body.classList.toggle("board-media-page", profile.layout === "media");
         window.BOARD_CONFIG = {
             calledPageSize: profile.calledPageSize,
