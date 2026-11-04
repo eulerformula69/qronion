@@ -696,17 +696,17 @@ const servicesHtml = data.services && data.services.length > 0
     : '<span style="color: var(--text-muted)">Услуги не назначены</span>';
 
         document.getElementById("operator-info").innerHTML = `
-            <div style="margin-bottom: 25px;">
-                <span style="color: var(--text-main); font-size: 1.1rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">Оператор</span><br>
-                <span style="font-size: 1.4rem; font-weight: 400; color: var(--text-muted); line-height: 1.8;">${data.operator_name}</span>
-            </div>
-            <div style="margin-bottom: 25px;">
-                <span style="color: var(--text-main); font-size: 1.1rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">Рабочее место</span><br>
-                <span style="font-size: 1.6rem; font-weight: 400; color: var(--text-muted); line-height: 1.8;">${data.window_name}</span>
+            <div>
+                <span class="operator-profile-label">Оператор</span>
+                <span class="operator-profile-value">${data.operator_name}</span>
             </div>
             <div>
-                <span style="color: var(--text-main); font-size: 1.1rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; display: block; margin-bottom: 12px;">Оказываемые услуги</span>
-                <div class="services-list" style="gap: 10px; font-weight: 400;">${servicesHtml}</div>
+                <span class="operator-profile-label">Рабочее место</span>
+                <span class="operator-profile-value">${data.window_name}</span>
+            </div>
+            <div>
+                <span class="operator-profile-label">Оказываемые услуги</span>
+                <div class="services-list">${servicesHtml}</div>
             </div>
         `;
 

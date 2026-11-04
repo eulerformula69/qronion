@@ -68,7 +68,7 @@ body.operator-page .main-layout{
 body.operator-page .glass-card{
     background: var(--card-bg);
     border-radius: 16px;
-    padding: 20px;
+    padding: 24px;
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
@@ -79,7 +79,7 @@ body.operator-page .glass-card{
 
 /* Центральная зона с номером */
 body.operator-page .display-zone{
-    padding: 40px 20px;
+    padding: 40px 24px 24px;
     min-width: 0;
     display: flex; /* Добавлено */
     flex-direction: column; /* Добавлено */
@@ -88,13 +88,13 @@ body.operator-page .display-zone{
     text-align: center; /* Центрирование текста */
 }
 body.operator-page .current-client-panel{
-    flex: 0 0 315px;
+    flex: 0 0 auto;
+    min-height: 232px;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 0;
 }
 
 body.operator-page .service-timer {
@@ -228,7 +228,7 @@ body.operator-page .primary-actions{
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
     width: 100%;
-    margin-top: 0;
+    margin-top: 32px;
 }
 
 body.operator-page .primary-actions button{
@@ -244,7 +244,7 @@ body.operator-page .secondary-actions{
     display: grid;
     gap: 12px;
     width: 100%;
-    margin-top: 15px;
+    margin-top: 16px;
 }
 
 body.operator-page .secondary-actions button{
@@ -848,12 +848,34 @@ body.operator-page .auto-call-info-block .auto-call-status-text[data-state="empt
 body.operator-page .auto-call-info-block .auto-call-status-text[data-state="disabled"]{
     color: var(--text-muted);
 }
-body.operator-page .service-row{
+body.operator-page #operator-info{
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+}
+body.operator-page .operator-profile-label{
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+body.operator-page .operator-profile-value{
+    font-size: 1.4rem;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+}
+body.operator-page #operator-info .services-list{
+    margin-top: 16px;
     gap: 12px;
+}
+body.operator-page .service-row{
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) 56px;
+    align-items: center;
+    gap: 8px;
     width: 100%;
-    padding: 4px 0;
+    padding: 0;
 }
 body.operator-page .service-priority{
     font-weight: 800;
@@ -862,6 +884,8 @@ body.operator-page .service-priority{
     min-width: 20px;
 }
 body.operator-page .service-name{
+    min-width: 0;
+    overflow-wrap: anywhere;
     font-size: 1.05rem;
     color: var(--text-muted);
     flex: 1;
