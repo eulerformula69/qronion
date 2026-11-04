@@ -1,9 +1,9 @@
 /* ===== operator.css ===== */
 body.operator-page h3{
     color: var(--primary);       /* Заголовки теперь синие */
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
     padding-bottom: 8px;
 }
 
@@ -92,7 +92,7 @@ body.operator-page .service-timer {
     margin-top: 10px;
     color: var(--text-muted);
     font-size: 0.95rem;
-    font-weight: 700;
+    font-weight: 500;
 }
 body.operator-page .ticket-label{
     font-size: 1.2rem;
@@ -684,17 +684,17 @@ body.operator-page .auto-call-container{
 /* Надпись "Автовызов" */
 body.operator-page .auto-call-label{
     font-size: 1.1rem;
-    font-weight: 800;
+    font-weight: 500;
     color: var(--primary);  /* Используем ваш темно-синий цвет */
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    text-transform: none;
+    letter-spacing: 0;
 }
 
 
 /* Главный текст: "Следующий клиент через..." */
 body.operator-page .auto-call-status-text{
     font-size: 1.25rem;      /* Крупный текст */
-    font-weight: 700;
+    font-weight: 500;
     color: var(--success);   /* Зеленый цвет для активного ожидания */
     min-height: 1.6rem;
     transition: color 160ms ease, opacity 160ms ease;
@@ -787,7 +787,7 @@ body.operator-page .auto-call-container{
 }
 body.operator-page .auto-call-status-text{
     font-size: 0.85rem;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--success);
     text-align: left;
 }
@@ -811,8 +811,8 @@ body.operator-page .display-zone .auto-call-info-block{
 }
 body.operator-page .auto-call-info-block strong{
     font-size: 0.95rem;
-    text-transform: uppercase;
-    font-weight: 800;
+    text-transform: none;
+    font-weight: 500;
     color: var(--text-main);
 }
 body.operator-page .auto-call-info-block .auto-call-status-text{
@@ -820,7 +820,7 @@ body.operator-page .auto-call-info-block .auto-call-status-text{
     min-height: 1.5rem;
     font-size: 1.08rem;
     line-height: 1.3;
-    font-weight: 800;
+    font-weight: 500;
     color: var(--primary);
     text-align: center;
     overflow-wrap: anywhere;

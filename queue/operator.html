@@ -29,7 +29,7 @@
 		
 		<div id="status-info-block" class="info-status" aria-live="polite">
 			<div id="status-dot" class="dot"></div>
-			<span id="status-text" style="font-weight: 700;">Загрузка...</span>
+			<span id="status-text" style="font-weight: 500;">Загрузка...</span>
 		</div>
 
     </div>
@@ -46,7 +46,7 @@
                 title="Настройки"
             >
                 <img src="icons/settings.svg" alt="" class="button-icon">
-                <span>НАСТРОЙКИ</span>
+                <span>Настройки</span>
             </button>
 
             <div id="operator-settings-popup" class="operator-settings-popup" role="dialog" aria-label="Настройки оператора">
@@ -116,14 +116,14 @@
                         </label>
                     </div>
 
-                    <button class="btn-outline operator-settings-wide-button" type="button" onclick="openOperatorDocumentation()">ИНСТРУКЦИЯ</button>
-                    <button class="btn-outline operator-settings-wide-button" type="button" onclick="openOperatorChangelogHistory()">ОБНОВЛЕНИЯ</button>
+                    <button class="btn-outline operator-settings-wide-button" type="button" onclick="openOperatorDocumentation()">Инструкция</button>
+                    <button class="btn-outline operator-settings-wide-button" type="button" onclick="openOperatorChangelogHistory()">Обновления</button>
                 </div>
             </div>
         </div>
         <button class="btn-outline icon-button" onclick="logout()">
             <img src="icons/logout.svg" alt="" class="button-icon">
-            <span>ВЫЙТИ</span>
+            <span>Выйти</span>
         </button>
     </div>
 </header>
@@ -151,14 +151,14 @@
 		<button id="deferred-reminder" class="deferred-reminder" type="button" onclick="selectQueueSection('deferred')" hidden></button>
 		<div id="queue-list" class="queue-list" style="flex:1; overflow-y:auto; min-height:0;">Загрузка...</div>
 		<!---<div style="flex-shrink:0; padding-top:16px; border-top:1px solid #e2e8f0;">
-			<span style="font-size:0.95rem; text-transform:uppercase; font-weight:800; color:var(--text-main); letter-spacing:0.5px;">Обслужено сегодня:</span>
+			<span style="font-size:0.95rem; font-weight:500; color:var(--text-main); letter-spacing:0;">Обслужено сегодня:</span>
 			<span id="served-today-count" style="font-size:1.8rem; font-weight:700; color:var(--primary); margin-left:10px;">—</span>
 		</div>--->
 	</section>
 
     <section class="glass-card display-zone" data-ticket-status="none">
         <div class="current-client-panel">
-            <div class="ticket-label">ТЕКУЩИЙ КЛИЕНТ</div>
+            <div class="ticket-label">Текущий клиент</div>
             <div id="current" class="ticket-number">--</div>
 		    <div id="current-service" class="current-service">—</div>
             <div id="service-timer" class="service-timer" aria-live="off" hidden>
