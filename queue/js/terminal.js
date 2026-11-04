@@ -435,9 +435,13 @@ function ensureOperatorChoiceModal() {
             <select id="operator-choice-select" class="operator-choice-select"></select>
             <div id="operator-choice-error" class="operator-choice-error"></div>
             <div id="operator-choice-list" class="operator-choice-list"></div>
+            <div id="operator-choice-offline" class="operator-choice-offline" hidden>
+                <h3>Оператор сейчас не работает</h3>
+                <p>Вы получите талон к выбранному оператору. Обслуживание начнётся только после его возвращения. Ожидание может быть долгим.</p>
+            </div>
             <div class="operator-choice-actions">
                 <button type="button" class="operator-choice-confirm" onclick="confirmOperatorChoice()">Получить талон</button>
-                <button type="button" class="operator-choice-cancel" onclick="closeOperatorChoiceModal()">Назад</button>
+                <button type="button" class="operator-choice-cancel" onclick="backFromOperatorChoice()">Назад</button>
             </div>
         </div>
     `;
@@ -464,6 +468,7 @@ async function chooseOperator(serviceId, serviceName) {
     }
 
     const overlay = ensureOperatorChoiceModal();
+    resetOperatorChoiceConfirmation();
     const select = document.getElementById("operator-choice-select");
     const errorEl = document.getElementById("operator-choice-error");
     const serviceEl = document.getElementById("operator-choice-service");
@@ -553,6 +558,22 @@ operators.forEach(operator => {
     }
 }
 
+function resetOperatorChoiceConfirmation() {
+    document.getElementById("operator-choice-offline").hidden = true;
+    document.getElementById("operator-choice-list").hidden = false;
+    document.querySelector(".operator-choice-confirm").textContent = "Получить талон";
+    document.querySelector(".operator-choice-cancel").textContent = "Назад";
+}
+
+function backFromOperatorChoice() {
+    if (!document.getElementById("operator-choice-offline").hidden) {
+        resetOperatorChoiceConfirmation();
+        document.querySelector(".operator-choice-card.selected").focus();
+        return;
+    }
+    closeOperatorChoiceModal();
+}
+
 function confirmOperatorChoice() {
     const pending = window.pendingOperatorChoice;
     const errorEl = document.getElementById("operator-choice-error");
@@ -565,10 +586,14 @@ function confirmOperatorChoice() {
         return;
     }
 
-    if (
-        window.selectedOperatorStatus === "offline" &&
-        !window.confirm("Оператор сейчас офлайн. Талон останется закреплён за ним до его возвращения. Продолжить?")
-    ) {
+    const warning = document.getElementById("operator-choice-offline");
+    if (window.selectedOperatorStatus === "offline" && warning.hidden) {
+        warning.hidden = false;
+        document.getElementById("operator-choice-list").hidden = true;
+        const confirm = document.querySelector(".operator-choice-confirm");
+        confirm.textContent = "Всё равно получить талон";
+        document.querySelector(".operator-choice-cancel").textContent = "Выбрать другого";
+        confirm.focus();
         return;
     }
 
