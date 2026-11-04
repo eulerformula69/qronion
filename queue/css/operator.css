@@ -435,8 +435,8 @@ body.operator-page #toast-notification{
     z-index: 2400;
 }
 body.operator-page #toast-notification[data-type="warning"]{
-    --toast-color: #a64613;
-    --toast-bg: #fff0e3;
+    --toast-color: #806000;
+    --toast-bg: #fff4bf;
 }
 body.operator-page #toast-notification[data-type="success"]{
     --toast-color: #267344;
