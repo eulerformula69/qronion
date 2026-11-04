@@ -128,3 +128,8 @@ body.board-page[data-board-profile="media"] .media-panel,
 body.board-page[data-board-profile="media"] .media-panel video{ background: #fff; }
 
 body.board-page[data-board-profile="media"] .clock-container{ border-bottom: 0; }
+
+body.board-page[data-board-profile="media"] .board-section-waiting{
+    border-right: 1px solid #dce4e6;
+    padding-right: 10px;
+}
