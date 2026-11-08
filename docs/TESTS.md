@@ -8,12 +8,12 @@
 
 | Компонент | Назначение |
 |-----------|------------|
-| [`requirements-dev.txt`](requirements-dev.txt) | Dev-зависимости: pytest, pytest-asyncio, pytest-cov |
-| [`pytest.ini`](pytest.ini) | Конфигурация pytest (`testpaths = tests/unit`) |
-| [`tests/conftest.py`](tests/conftest.py) | Общие настройки (`TESTING=true` для тестового окружения) |
-| [`tests/unit/`](tests/unit/) | 52 unit-теста чистой логики |
+| [`requirements-dev.txt`](../requirements-dev.txt) | Dev-зависимости: pytest, pytest-asyncio, pytest-cov |
+| [`pytest.ini`](../pytest.ini) | Конфигурация pytest (`testpaths = tests/unit`) |
+| [`tests/conftest.py`](../tests/conftest.py) | Общие настройки (`TESTING=true` для тестового окружения) |
+| [`tests/unit/`](../tests/unit/) | 52 unit-теста чистой логики |
 
-Небольшое изменение в приложении: в [`app/application.py`](app/application.py) при `TESTING=true` не запускаются фоновые задачи (обработчик медиа и очистка сессий). На production это не влияет.
+Небольшое изменение в приложении: в [`app/application.py`](../app/application.py) при `TESTING=true` не запускаются фоновые задачи (обработчик медиа и очистка сессий). На production это не влияет.
 
 ### Что покрывают unit-тесты
 
@@ -141,7 +141,7 @@ PostgreSQL, Docker и Node.js **не нужны**.
 ```text
 requirements-dev.txt
 pytest.ini
-TESTS.md                 ← этот файл
+docs/TESTS.md            ← этот файл
 tests/
   conftest.py
   unit/

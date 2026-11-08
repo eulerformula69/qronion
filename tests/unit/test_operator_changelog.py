@@ -163,7 +163,7 @@ def test_operator_changelog_json_has_operator_facing_russian_text():
 
 
 def test_operator_changelog_policy_exists():
-    policy = read_text("CHANGELOG_POLICY.md")
+    policy = read_text("docs/CHANGELOG_POLICY.md")
 
     assert "`queue/changelog/operator.json` обновляется только" in policy
     assert "Не обновлять operator changelog для изменений табло, терминала, админки, статистики" in policy
