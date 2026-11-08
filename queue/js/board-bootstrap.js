@@ -63,7 +63,7 @@
         loadScript("/queue/js/media-lite.js?v=board-profile-7");
         loadScript("/queue/js/tts-lite.js?v=board-profile-7");
         loadScript("/queue/js/board-ticker.js");
-        loadScript("/queue/js/board-lite.js?v=board-profile-7");
+        loadScript("/queue/js/board-lite.js?v=board-recovery-1");
         loadScript("/queue/js/board-lite2.js?v=board-profile-2");
         return;
     }
@@ -71,5 +71,5 @@
     loadScript("/queue/js/tts.js");
     loadScript("/queue/js/board-ticker.js");
     loadScript("/queue/js/board-profiles.js");
-    loadScript("/queue/js/board.js");
+    loadScript("/queue/js/board.js?v=board-recovery-1");
 })();

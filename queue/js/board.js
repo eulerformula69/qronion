@@ -58,6 +58,7 @@ function getTicketLabel() {
 
 function connectWS() {
     ws = new WebSocket(CONFIG.WS_BOARD_URL);
+    window.watchBoardConnection(ws);
     ws.onopen = () => {
         document.getElementById("ws-status").textContent = "WS: connected";
     };

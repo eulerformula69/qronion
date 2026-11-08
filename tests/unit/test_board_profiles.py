@@ -15,7 +15,7 @@ def test_board_html_loads_profiles_before_board_script():
     source = _read("queue/board.html")
     bootstrap = _read("queue/js/board-bootstrap.js")
 
-    assert '<script src="/queue/js/board-bootstrap.js?v=board-profile-7"></script>' in source
+    assert '<script src="/queue/js/board-bootstrap.js?v=board-profile-8"></script>' in source
     assert 'loadScript("/queue/js/board-profiles.js")' in bootstrap
     assert bootstrap.index('/queue/js/board-profiles.js') < bootstrap.index('/queue/js/board.js')
 
@@ -52,8 +52,8 @@ def test_media_screen_uses_standard_board_with_media_profile():
     assert 'videoAudioEnabled: getBooleanFlag("video_audio", true)' in bootstrap
     assert 'loadScript("/queue/js/media-lite.js?v=board-profile-7")' in bootstrap
     assert 'loadScript("/queue/js/tts-lite.js?v=board-profile-7")' in bootstrap
-    assert 'loadScript("/queue/js/board-lite.js?v=board-profile-7")' in bootstrap
-    assert 'loadScript("/queue/js/board.js")' in bootstrap
+    assert 'loadScript("/queue/js/board-lite.js?v=board-recovery-1")' in bootstrap
+    assert 'loadScript("/queue/js/board.js?v=board-recovery-1")' in bootstrap
 
 
 def test_media_profile_hides_ticket_and_operator_labels_in_cards():

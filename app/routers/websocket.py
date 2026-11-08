@@ -122,8 +122,15 @@ async def websocket_board(websocket: WebSocket):
         await websocket.send_json(get_board_state())
 
         while True:
-            if await receive_text_or_none(websocket) is None:
+            raw = await receive_text_or_none(websocket)
+            if raw is None:
                 break
+            try:
+                message = json.loads(raw)
+            except (ValueError, TypeError):
+                continue
+            if isinstance(message, dict) and message.get("type") == "board_sync":
+                await websocket.send_json(get_board_state())
 
     except WebSocketDisconnect:
         pass

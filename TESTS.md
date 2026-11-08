@@ -212,3 +212,25 @@ node --test tests/javascript/terminal-ticket-request.test.cjs
 
 The creation tests install the existing numbering function in `public`, just as
 the application does. Run them on a dedicated disposable PostgreSQL server.
+
+
+## Board recovery after missed notifications
+
+Both board engines request a full `board_state` over `/ws/board` on connection
+and every 15 seconds. The server answers `{"type":"board_sync"}` requests
+with the current state, even when no change notification was delivered.
+If no full-state response arrives within 10 seconds, the client closes the
+connection and uses the existing reconnect path. Closing a connection clears
+its recovery timers. State snapshots replace displayed tickets without replaying
+old call audio. This repairs screen state, but does not guarantee delivery of a
+missed announcement.
+
+Deploy the backend before the refreshed board scripts. Reopen existing board
+pages once after deployment to load recovery support. The PostgreSQL test checks
+missed assignment and completion notifications, repeated sync requests, malformed
+messages, and reconnect. JavaScript tests check both engines with controlled time.
+
+```powershell
+python -m pytest tests/integration/test_board_recovery.py tests/unit/test_websocket_routes.py -q
+node --test tests/javascript/board-recovery.test.cjs
+```

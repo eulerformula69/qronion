@@ -475,6 +475,7 @@
     function connectWS() {
         try {
             ws = new WebSocket(CONFIG.WS_BOARD_URL);
+            window.watchBoardConnection(ws);
         } catch (e) {
             setStatus("WS: error");
             setTimeout(connectWS, RECONNECT_MS);
