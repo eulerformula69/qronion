@@ -183,3 +183,32 @@ The tests cover independent operators claiming one or two tickets while the firs
 transaction remains open, simultaneous requests for one window, repeated calls,
 and retry after rollback. SQL statements have an eight-second timeout so a lock
 regression fails instead of waiting without a limit.
+
+
+## Durable ticket issuance
+
+The terminal sends a UUID `request_id` with `POST /tickets/`. The server stores
+the request payload and receipt in `ticket_creation_requests` in the same
+transaction as the ticket. Concurrent retries return the original receipt.
+A different payload with the same ID returns HTTP 409. Existing clients without
+an ID remain compatible, but do not receive duplicate protection.
+
+Application startup creates the new table through the existing metadata setup.
+Deploy the backend before the updated terminal. Request records must remain
+available for retries and must be included in database backups.
+
+The terminal stores an uncertain request in localStorage and retries it once
+with the same ID. Reloading preserves the request. Until the result is known,
+the terminal asks the user to retry the same service and selected operator.
+Clearing browser storage removes this recovery state. This does not guarantee
+exactly one physical printout.
+
+Run the issuance checks:
+
+```powershell
+python -m pytest tests/integration/test_ticket_creation.py -q
+node --test tests/javascript/terminal-ticket-request.test.cjs
+```
+
+The creation tests install the existing numbering function in `public`, just as
+the application does. Run them on a dedicated disposable PostgreSQL server.

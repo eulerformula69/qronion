@@ -16,7 +16,7 @@ def test_online_and_break_windows_keep_terminal_services_available():
 
 def test_terminal_service_paths_keep_automatic_and_manual_status_rules_separate():
     services_router = read_text("app/routers/services.py")
-    tickets_router = read_text("app/routers/tickets.py")
+    tickets_router = read_text("app/routers/ticket_creation.py")
     operator_service = read_text("app/services/operators.py")
 
     assert 'Service.operator_choice_allow_offline == 1' in services_router

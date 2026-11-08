@@ -1,3 +1,4 @@
+from uuid import UUID
 from datetime import datetime
 from typing import List, Literal
 
@@ -94,6 +95,7 @@ class ServiceOrderUpdate(BaseModel):
 
 
 class TicketCreate(BaseModel):
+    request_id: UUID | None = None
     service_id: int
     window_id: int | None = None
 

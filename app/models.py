@@ -305,3 +305,11 @@ class CloseDaySchedule(Base):
     operator_action = Column(String(16), nullable=False, default="offline", server_default="offline")
     ticket_action = Column(String(16), nullable=False, default="cancel", server_default="cancel")
     last_run_date = Column(String(10), nullable=True)
+
+
+class TicketCreationRequest(Base):
+    __tablename__ = "ticket_creation_requests"
+
+    request_id = Column(String(36), primary_key=True)
+    payload = Column(String, nullable=False)
+    response = Column(String, nullable=False)

@@ -615,19 +615,9 @@ async function createTicket(serviceId, serviceName, windowId = null) {
     }
 
     try {
-        const response = await fetch(`${CONFIG.API_URL}/tickets`, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "session-id": currentSession
-            },
-            body: JSON.stringify({
-                service_id: serviceId,
-                window_id: windowId
-            })
-        });
-
-        const data = await response.json();
+        const { response, data } = await submitTicketRequest(
+            serviceId, windowId, serviceName, currentSession
+        );
         // Обработка ошибок 
         if (!response.ok) {
             if (response.status === 401) {
@@ -662,7 +652,7 @@ async function createTicket(serviceId, serviceName, windowId = null) {
 
     } catch (error) {
         console.error("Ошибка при создании билета:", error);
-        showNotice("Сбой связи с сервером.", 4);
+        showNotice(error.message || "Сбой связи с сервером.", 6);
     } finally {
         // Разблокировка кнопок
         buttons.forEach(btn => {
