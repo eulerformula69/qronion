@@ -164,3 +164,22 @@ tests/
 | Нужна ли БД? | **Нет** |
 | Сколько тестов? | **52** unit |
 | Команда | `pytest` или `py -m pytest` |
+
+## PostgreSQL: concurrent ticket claims
+
+Run the integration tests against a separate PostgreSQL test database:
+
+```powershell
+$env:QRONION_TEST_DATABASE_URL = 'postgresql://postgres@127.0.0.1:55439/postgres'
+python -m pytest tests/integration/test_ticket_claims.py -q
+```
+
+The account must be able to create schemas. Each test creates a unique schema
+and removes it after completion. Tests do not run application startup migrations.
+Use a test server, not a production database. Without this variable, these tests
+are skipped. The default `pytest` command still runs the unit suite only.
+
+The tests cover independent operators claiming one or two tickets while the first
+transaction remains open, simultaneous requests for one window, repeated calls,
+and retry after rollback. SQL statements have an eight-second timeout so a lock
+regression fails instead of waiting without a limit.
