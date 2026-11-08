@@ -146,6 +146,10 @@ if [[ ! -f "${APP_DIR}/main.env" ]] \
     FIRST_INSTALL=1
 fi
 
+if systemctl cat "${SERVICE_NAME}" >/dev/null 2>&1; then
+    systemctl stop "${SERVICE_NAME}"
+fi
+
 log "Копирую приложение"
 install -m 0644 "${SOURCE_DIR}/main.py" "${APP_DIR}/main.py"
 install -d -o "${APP_USER}" -g "${APP_USER}" "${APP_DIR}/app"
@@ -153,6 +157,9 @@ rsync -a --delete \
     --exclude '__pycache__/' \
     "${SOURCE_DIR}/app/" "${APP_DIR}/app/"
 install -m 0644 "${SOURCE_DIR}/requirements.txt" "${APP_DIR}/requirements.txt"
+install -m 0644 "${SOURCE_DIR}/alembic.ini" "${APP_DIR}/alembic.ini"
+install -d "${APP_DIR}/migrations"
+rsync -a --delete --exclude '__pycache__/' "${SOURCE_DIR}/migrations/" "${APP_DIR}/migrations/"
 install -m 0750 "${SOURCE_DIR}/scripts/manageAdmins.py" "${APP_DIR}/scripts/manageAdmins.py"
 install -m 0750 "${SOURCE_DIR}/scripts/closeDay.py" "${APP_DIR}/scripts/closeDay.py"
 install -m 0644 "${SOURCE_DIR}/scripts/grafana_dashboard.py" "${APP_DIR}/scripts/grafana_dashboard.py"
@@ -303,6 +310,12 @@ engine = create_engine(database_url)
 with engine.connect() as connection:
     connection.execute(text("SELECT 1"))
 PY
+
+log "Готовлю структуру базы данных"
+if [[ ${FIRST_INSTALL} -ne 1 ]]; then
+    bash "${APP_DIR}/deploy/backup_db.sh" --project-dir "${APP_DIR}" --label before_migration
+fi
+(cd "${APP_DIR}" && runuser -u "${APP_USER}" -- "${APP_DIR}/venv/bin/python" -m app.schema upgrade)
 
 log "Настраиваю автоматический запуск"
 cat > "/etc/systemd/system/${SERVICE_NAME}" <<EOF

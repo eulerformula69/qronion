@@ -14,6 +14,11 @@ AVAILABLE_WINDOW_STATUSES = frozenset({"online", "break"})
 
 class Service(Base):
     __tablename__ = "services"
+    __table_args__ = (
+        Index("ix_services_display_order", "display_order", "id"),
+        Index("ix_services_is_archived_display_order", "is_archived", "display_order", "id"),
+        Index("ix_services_service_group_id", "service_group_id"),
+    )
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     display_order = Column(Integer, nullable=False, default=0, server_default=text("0"))
@@ -37,6 +42,9 @@ class Service(Base):
 
 class ServiceGroup(Base):
     __tablename__ = "service_groups"
+    __table_args__ = (
+        Index("ix_service_groups_display_order", "display_order", "id"),
+    )
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     display_order = Column(Integer, nullable=False, default=0, server_default=text("0"))
@@ -45,6 +53,12 @@ class ServiceGroup(Base):
 class Ticket(Base):
     __tablename__ = "tickets"
     __table_args__ = (
+        Index("ix_tickets_operator_id", "operator_id"),
+        Index("ix_tickets_operator_finished_at", "operator_id", "finished_at"),
+        Index("ix_tickets_status_queue_entered_at", "status", "queue_entered_at"),
+        Index("ix_tickets_operator_deferred_at", "operator_id", "deferred_at"),
+        Index("ix_tickets_window_status_deferred_at", "window_id", "status", "deferred_at"),
+        Index("ix_tickets_status_service_started_at", "status", "service_started_at"),
         CheckConstraint(
             "completion_reason IS NULL OR completion_reason IN "
             "('completed', 'redirected', 'cancelled')",
@@ -88,6 +102,9 @@ class Ticket(Base):
 
 class Operator(Base):
     __tablename__ = "operators"
+    __table_args__ = (
+        Index("ix_operators_next_auto_call_at", "next_auto_call_at", postgresql_where=text("next_auto_call_at IS NOT NULL")),
+    )
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     login = Column(String, unique=True, nullable=False)
@@ -100,6 +117,8 @@ class Operator(Base):
 class OperatorServiceNotification(Base):
     __tablename__ = "operator_service_notifications"
     __table_args__ = (
+        Index("ix_operator_service_notifications_operator_id", "operator_id"),
+        Index("ix_operator_service_notifications_service_id", "service_id"),
         UniqueConstraint("operator_id", "service_id", name="uq_operator_service_notifications"),
     )
 

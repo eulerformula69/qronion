@@ -14,7 +14,8 @@ sys.path.insert(0, str(PROJECT_DIR))
 load_dotenv(PROJECT_DIR / "main.env", override=True)
 print(f"Пользователь базы данных: {make_url(os.environ['DATABASE_URL']).username}")
 
-from main import Admin, SessionLocal
+from app.database import SessionLocal
+from app.models import Admin
 
 
 def create_account(login: str, password: str, status: str) -> bool:

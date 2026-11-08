@@ -576,7 +576,9 @@ def main() -> None:
         write_installed_revision(project_dir, target_revision)
         print(f"  версия релиза: {target_revision}")
 
-        print("\nГотово.")
+        print("\nФайлы обновлены. Перед запуском очереди обновите зависимости, сделайте копию БД")
+        print("и выполните из каталога проекта: venv/bin/python -m app.schema upgrade")
+        print("При ошибке миграции не запускайте службу очереди.")
 
         if backup_dir:
             print(f"Старые версии файлов лежат здесь: {backup_dir}")

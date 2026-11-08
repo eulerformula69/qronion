@@ -7,7 +7,6 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.migrations import init_ticket_numbering
 from app.dependencies import get_current_terminal
 from app.models import Service, Ticket, TicketCreationRequest
 from app.routers import ticket_creation
@@ -15,7 +14,6 @@ from app.routers import ticket_creation
 
 @pytest.fixture
 def api(database, monkeypatch):
-    init_ticket_numbering(database.kw["bind"])
     monkeypatch.setattr(ticket_creation, "SessionLocal", database)
     app = FastAPI()
     app.include_router(ticket_creation.router)

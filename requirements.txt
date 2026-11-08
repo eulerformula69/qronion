@@ -8,3 +8,5 @@ psycopg2-binary
 python-multipart
 piper-tts
 websockets
+
+alembic>=1.13,<2

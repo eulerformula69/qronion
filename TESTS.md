@@ -174,8 +174,8 @@ $env:QRONION_TEST_DATABASE_URL = 'postgresql://postgres@127.0.0.1:55439/postgres
 python -m pytest tests/integration/test_ticket_claims.py -q
 ```
 
-The account must be able to create schemas. Each test creates a unique schema
-and removes it after completion. Tests do not run application startup migrations.
+The account must be able to create schemas. Each test creates a unique schema, installs it through Alembic,
+and removes it after completion. Application startup only checks the schema.
 Use a test server, not a production database. Without this variable, these tests
 are skipped. The default `pytest` command still runs the unit suite only.
 
@@ -193,7 +193,7 @@ transaction as the ticket. Concurrent retries return the original receipt.
 A different payload with the same ID returns HTTP 409. Existing clients without
 an ID remain compatible, but do not receive duplicate protection.
 
-Application startup creates the new table through the existing metadata setup.
+The initial Alembic migration creates the request table before startup.
 Deploy the backend before the updated terminal. Request records must remain
 available for retries and must be included in database backups.
 
@@ -210,8 +210,8 @@ python -m pytest tests/integration/test_ticket_creation.py -q
 node --test tests/javascript/terminal-ticket-request.test.cjs
 ```
 
-The creation tests install the existing numbering function in `public`, just as
-the application does. Run them on a dedicated disposable PostgreSQL server.
+The tests install the numbering function in their isolated schemas.
+Run them on a dedicated disposable PostgreSQL server.
 
 
 ## Board recovery after missed notifications
@@ -234,3 +234,20 @@ messages, and reconnect. JavaScript tests check both engines with controlled tim
 python -m pytest tests/integration/test_board_recovery.py tests/unit/test_websocket_routes.py -q
 node --test tests/javascript/board-recovery.test.cjs
 ```
+
+
+## Schema installation and recovery
+
+`tests/integration/test_schema_migrations.py` checks a clean Alembic install,
+repeated upgrade without data loss or a number reset, rollback after a partial
+failure, retry, rejection of unversioned databases, startup with read-only access,
+wrong revisions, missing structure, model compatibility, concurrent installers,
+and a copied install package with its own `main.env` and initial accounts.
+
+```powershell
+python -m pytest tests/integration/test_schema_migrations.py -q
+```
+
+The test package runs the migration CLI from another directory. This checks the
+files needed for a VM install. It does not replace a full Ubuntu installation
+with systemd, Nginx, PostgreSQL packages, and Grafana.
