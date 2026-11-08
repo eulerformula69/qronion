@@ -10,6 +10,8 @@ data/map.json
 data/docs/
 
 .pytest_cache/
+.test-cache/
+.tmp-pytest-cache/
 .coverage
 htmlcov/
 node_modules/
@@ -19,7 +21,7 @@ test-results/
 .git
 .agents
 
-NEXT.md
+# Project plans are tracked under docs/plans/
 
 # Generated project snapshot
 repomix-output.xml
