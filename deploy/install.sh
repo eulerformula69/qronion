@@ -95,7 +95,7 @@ fi
 
 # shellcheck disable=SC1091
 source /etc/os-release
-if [[ ${ID:-} != "ubuntu" ]]; then
+if [[ ${ID:-} != "ubuntu" || ${VERSION_ID:-} != "24.04" || $(uname -m) != "x86_64" ]]; then
     fail "поддерживается Ubuntu 24.04 LTS (обнаружено: ${PRETTY_NAME:-неизвестно})"
 fi
 
@@ -105,7 +105,7 @@ log "Устанавливаю системные компоненты"
 rm -f /etc/apt/sources.list.d/grafana.list
 apt-get update
 apt-get install -y \
-    python3 python3-venv python3-pip postgresql nginx rsync curl iproute2 \
+    python3 python3-venv python3-pip postgresql nginx rsync curl iproute2 git \
     mkcert libnss3-tools openssl acl ffmpeg
 
 SERVER_IP="${QUEUE_SERVER_IP:-}"
@@ -274,29 +274,7 @@ fi
 chown -R "${APP_USER}:${APP_USER}" "${APP_DIR}"
 chmod 0600 "${APP_DIR}/main.env"
 
-cat > /usr/local/bin/queue-admin <<EOF
-#!/bin/sh
-exec runuser -u ${APP_USER} -- ${APP_DIR}/venv/bin/python ${APP_DIR}/scripts/manageAdmins.py "\$@"
-EOF
-chmod 0755 /usr/local/bin/queue-admin
-
-cat > /usr/local/bin/queue-close-day <<EOF
-#!/bin/sh
-exec runuser -u ${APP_USER} -- ${APP_DIR}/venv/bin/python ${APP_DIR}/scripts/closeDay.py "\$@"
-EOF
-chmod 0755 /usr/local/bin/queue-close-day
-
-cat > /usr/local/bin/queue-backup <<EOF
-#!/bin/sh
-exec bash ${APP_DIR}/deploy/backup_db.sh "\$@"
-EOF
-chmod 0755 /usr/local/bin/queue-backup
-
-cat > /usr/local/bin/queue-restore <<EOF
-#!/bin/sh
-exec bash ${APP_DIR}/deploy/restore_db.sh "\$@"
-EOF
-chmod 0755 /usr/local/bin/queue-restore
+source "${SOURCE_DIR}/deploy/install_management.sh"
 
 log "Проверяю подключение к базе данных"
 runuser -u "${APP_USER}" -- "${APP_DIR}/venv/bin/python" - "${APP_DIR}/main.env" <<'PY'
@@ -628,6 +606,18 @@ if ! curl --fail --silent --output /dev/null http://127.0.0.1:3000/api/health; t
     fail "Grafana не ответила. Выше показан журнал ошибки"
 fi
 
+if git -C "${SOURCE_DIR}" rev-parse --verify HEAD >/dev/null 2>&1; then
+    SOURCE_REVISION="$(git -C "${SOURCE_DIR}" rev-parse --short=12 HEAD)"
+    PYTHONPATH="${SOURCE_DIR}/deploy" python3 - "${APP_DIR}" "${SOURCE_REVISION}" <<'PY'
+import sys
+from pathlib import Path
+from update_from_git import write_installed_revision
+
+write_installed_revision(Path(sys.argv[1]), sys.argv[2])
+PY
+    chown "${APP_USER}:${APP_USER}" "${APP_DIR}/release.json"
+fi
+
 touch "${APP_DIR}/.queue-installed"
 chown "${APP_USER}:${APP_USER}" "${APP_DIR}/.queue-installed"
 
@@ -663,6 +653,7 @@ else
     printf 'Пароли:     sudo cat /root/queue-credentials.txt\n'
     printf 'Сертификат: %s\n' "${ROOT_CA_EXPORT}"
 fi
+printf 'Управление сервером: sudo qronion\n'
 printf 'Резервная копия: %s\n' "${BACKUP_DIR}"
 printf 'Grafana:    просмотр без пароля; редактирование через admin\n'
 if [[ ${CA_CREATED} -eq 1 ]]; then
