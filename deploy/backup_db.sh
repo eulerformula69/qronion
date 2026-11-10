@@ -88,21 +88,22 @@ if [[ -n "${LABEL}" ]]; then
 else
     dump_name="queue_${timestamp}.dump"
 fi
-dump_path="${BACKUP_ROOT}/${dump_name}"
+temporary_dump="$(mktemp "${BACKUP_ROOT}/.queue_XXXXXXXXXX")"
+trap 'rm -f -- "${temporary_dump}"' EXIT
+dump_path="${BACKUP_ROOT}/${dump_name%.dump}_${temporary_dump##*_}.dump"
 
 log "Создаю дамп: ${dump_path}"
-
 run_as_app_user pg_dump \
     --format=custom \
     --no-owner \
     --no-privileges \
-    --file="${dump_path}" \
-    "${DATABASE_URL}"
+    "${DATABASE_URL}" > "${temporary_dump}"
 
-chmod 0640 "${dump_path}" 2>/dev/null || true
 if [[ ${EUID} -eq 0 ]]; then
-    chown root:"${APP_USER}" "${dump_path}" 2>/dev/null || true
+    chown root:"${APP_USER}" "${temporary_dump}"
 fi
+chmod 0640 "${temporary_dump}"
+ln -- "${temporary_dump}" "${dump_path}"
 
 dump_size="$(du -h "${dump_path}" | awk '{print $1}')"
 log "Готово (${dump_size}): ${dump_path}"

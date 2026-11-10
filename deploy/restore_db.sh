@@ -88,7 +88,7 @@ if [[ -z "${DUMP_FILE}" ]]; then
 fi
 
 if [[ "${DUMP_FILE}" == "latest" ]]; then
-    DUMP_FILE="$(find "${BACKUP_ROOT}" -maxdepth 1 -type f -name 'queue_*.dump' -printf '%T@ %p\n' 2>/dev/null \
+    DUMP_FILE="$(find "${BACKUP_ROOT}" -maxdepth 1 -type f -name 'queue_*.dump' ! -name '*_before_restore.dump' ! -name '*_before_restore_*.dump' -printf '%T@ %p\n' 2>/dev/null \
         | sort -nr \
         | head -n 1 \
         | cut -d' ' -f2-)"
@@ -100,7 +100,7 @@ if [[ ! -f "${DUMP_FILE}" ]]; then
 fi
 
 log "Файл дампа: ${DUMP_FILE}"
-log "База: ${DATABASE_URL}"
+run_as_app_user pg_restore --list "${DUMP_FILE}" > /dev/null
 
 if [[ ${ASSUME_YES} -ne 1 ]]; then
     printf '\n\033[1;33mВсе текущие данные в базе будут заменены содержимым дампа.\033[0m\n'
@@ -116,14 +116,6 @@ if service_is_active; then
     stop_queue_service
 fi
 
-cleanup() {
-    if [[ ${service_was_running} -eq 1 ]]; then
-        log "Запускаю ${SERVICE_NAME}"
-        start_queue_service || true
-    fi
-}
-trap cleanup EXIT
-
 if [[ ${SKIP_SAFETY_BACKUP} -eq 0 ]]; then
     log "Создаю страховочный дамп текущей базы перед восстановлением"
     SAFETY_LABEL="before_restore"
@@ -137,6 +129,7 @@ fi
 log "Восстанавливаю базу из дампа"
 
 run_as_app_user pg_restore \
+    --single-transaction \
     --clean \
     --if-exists \
     --no-owner \
@@ -144,17 +137,11 @@ run_as_app_user pg_restore \
     --dbname="${DATABASE_URL}" \
     "${DUMP_FILE}"
 
-log "Проверяю подключение к базе"
-run_as_app_user "${APP_DIR}/venv/bin/python" - "${ENV_FILE}" <<'PY'
-import sys
+log "Проверяю структуру восстановленной базы"
+(cd "${APP_DIR}" && run_as_app_user "${APP_DIR}/venv/bin/python" -m app.schema check)
 
-from dotenv import dotenv_values
-from sqlalchemy import create_engine, text
-
-database_url = dotenv_values(sys.argv[1])["DATABASE_URL"]
-engine = create_engine(database_url)
-with engine.connect() as connection:
-    connection.execute(text("SELECT 1"))
-PY
-
+if [[ ${service_was_running} -eq 1 ]]; then
+    log "Запускаю ${SERVICE_NAME}"
+    start_queue_service
+fi
 log "Восстановление завершено успешно"
