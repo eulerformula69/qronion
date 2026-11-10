@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from operator import eq, ge, lt
 
 import pytest
@@ -95,7 +95,7 @@ def test_call_specific_rejects_non_waiting_ticket(monkeypatch, ticket_status):
         id=10,
         number=42,
         status=ticket_status,
-        created_at=datetime.now() - timedelta(hours=1),
+        created_at=datetime.now(UTC) - timedelta(hours=1),
     )
     db = FakeDb([ticket])
     monkeypatch.setattr(tickets_router, "SessionLocal", lambda: db)
@@ -113,7 +113,7 @@ def test_call_specific_rejects_non_waiting_ticket(monkeypatch, ticket_status):
 
 
 def test_call_specific_calls_today_waiting_ticket(monkeypatch):
-    now = datetime.now()
+    now = datetime.now(UTC)
     service = Service(id=5, name="Consultation")
     ticket = Ticket(
         id=10,
@@ -121,7 +121,7 @@ def test_call_specific_calls_today_waiting_ticket(monkeypatch):
         service_id=service.id,
         status="waiting",
         target_window_id=None,
-        created_at=now - timedelta(hours=2),
+        created_at=now,
     )
     ticket.service = service
     window = Window(id=3, name="3")

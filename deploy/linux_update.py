@@ -23,6 +23,7 @@ def installation_path(preferred=Path('/home/qronion'), legacy=Path('/home/queue/
 
 APP_DIR = installation_path()
 REPO = 'https://github.com/eulerformula69/electronicqueue.git'
+GRAFANA_DASHBOARD = Path("/var/lib/grafana/dashboards/queue-statistics.json")
 STATE_ROOT = Path('/var/lib/queue-update')
 
 
@@ -145,6 +146,8 @@ def execute(source, project, state_file, backend, check=False):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, target)
             existing.append(name)
+    if GRAFANA_DASHBOARD.is_file():
+        shutil.copy2(GRAFANA_DASHBOARD, transaction / 'grafana-before.json')
     state = dict(transaction=str(transaction), environment=str(environment), changed=[*changed, 'release.json'],
                  existing=existing, phase='prepared', revision=revision)
     save(state_file, state)
@@ -168,6 +171,12 @@ def execute(source, project, state_file, backend, check=False):
         save(state_file, state)
         print('[4/5] Обновляю и проверяю структуру БД.', flush=True)
         app_run(backend, project, '-m', 'app.schema', 'upgrade')
+        if (transaction / 'grafana-before.json').exists():
+            dashboard = transaction / 'dashboard' / 'queue-statistics.json'
+            backend.run('install', '-d', '-o', 'queue', '-m', '0700', dashboard.parent)
+            app_run(backend, project, project / 'scripts/normalizeGrafanaDashboard.py',
+                    '--installation', project / 'data/statistics.json', dashboard)
+            backend.run('install', '-o', 'grafana', '-g', 'grafana', '-m', '0640', dashboard, GRAFANA_DASHBOARD)
         print('[5/5] Запускаю очередь и проверяю ответ.', flush=True)
         backend.run('systemctl', 'start', 'queue.service')
         backend.healthy()
@@ -205,6 +214,10 @@ def recover(project, state_file, backend):
                 current.unlink()
             old.rename(current)
         if state['phase'] == 'migration':
+            previous_dashboard = transaction / 'grafana-before.json'
+            if previous_dashboard.exists():
+                backend.run('install', '-o', 'grafana', '-g', 'grafana', '-m', '0640',
+                            previous_dashboard, GRAFANA_DASHBOARD)
             dumps = list((transaction / 'db').glob('*.dump'))
             if len(dumps) != 1:
                 raise RuntimeError(f'Не найден единственный дамп БД: {transaction / "db"}')

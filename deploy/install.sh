@@ -162,8 +162,10 @@ install -m 0644 "${SOURCE_DIR}/alembic.ini" "${APP_DIR}/alembic.ini"
 install -d "${APP_DIR}/migrations"
 rsync -a --delete --exclude '__pycache__/' "${SOURCE_DIR}/migrations/" "${APP_DIR}/migrations/"
 install -m 0750 "${SOURCE_DIR}/scripts/manageAdmins.py" "${APP_DIR}/scripts/manageAdmins.py"
+install -m 0644 "${SOURCE_DIR}/scripts/close_day_schedule.py" "${APP_DIR}/scripts/close_day_schedule.py"
 install -m 0750 "${SOURCE_DIR}/scripts/closeDay.py" "${APP_DIR}/scripts/closeDay.py"
 install -m 0644 "${SOURCE_DIR}/scripts/grafana_dashboard.py" "${APP_DIR}/scripts/grafana_dashboard.py"
+install -m 0750 "${SOURCE_DIR}/scripts/syncGrafanaDashboard.py" "${APP_DIR}/scripts/syncGrafanaDashboard.py"
 install -m 0750 "${SOURCE_DIR}/scripts/normalizeGrafanaDashboard.py" "${APP_DIR}/scripts/normalizeGrafanaDashboard.py"
 install -m 0750 "${SOURCE_DIR}/deploy/update_from_git.py" "${APP_DIR}/deploy/update_from_git.py"
 install -m 0750 "${SOURCE_DIR}/deploy/configure_grafana_embed.sh" "${APP_DIR}/deploy/configure_grafana_embed.sh"
@@ -202,6 +204,7 @@ if [[ ${FIRST_INSTALL} -eq 1 ]]; then
         -c "ALTER DATABASE ${DB_NAME} OWNER TO ${DB_USER}"
 
     cat > "${APP_DIR}/main.env" <<EOF
+QUEUE_TIMEZONE=${QUEUE_TIMEZONE:-$(timedatectl show --property=Timezone --value)}
 DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@127.0.0.1:5432/${DB_NAME}
 GRAFANA_DB_PASSWORD=${GRAFANA_DB_PASSWORD}
 CORS_ORIGINS=http://${SERVER_IP},https://${SERVER_IP},http://localhost,http://127.0.0.1
@@ -423,7 +426,8 @@ if [[ ! -f "${DASHBOARD_SOURCE}" ]]; then
 fi
 [[ -n "${DASHBOARD_SOURCE}" && -f "${DASHBOARD_SOURCE}" ]] \
     || fail "не найден JSON-дашборд Grafana в папке проекта"
-python3 "${APP_DIR}/scripts/normalizeGrafanaDashboard.py" \
+install -D -m 0644 "${DASHBOARD_SOURCE}" "${APP_DIR}/data/statistics.json"
+"${APP_DIR}/venv/bin/python" "${APP_DIR}/scripts/normalizeGrafanaDashboard.py" --installation \
     "${DASHBOARD_SOURCE}" /var/lib/grafana/dashboards/queue-statistics.json \
     || fail "не удалось нормализовать JSON-дашборд Grafana"
 chown -R grafana:grafana /var/lib/grafana/dashboards

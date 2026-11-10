@@ -183,12 +183,12 @@ function statusBadge(status) {
 }
 
 function formatTime(value) {
-    return value ? new Intl.DateTimeFormat("ru-RU", {timeStyle: "medium"}).format(value) : "—";
+    return value ? new Intl.DateTimeFormat("ru-RU", {timeZone: CONFIG.TIME_ZONE, timeStyle: "medium"}).format(value) : "—";
 }
 
 function formatDate(value) {
     if (!value) return "—";
-    return new Intl.DateTimeFormat("ru-RU", {dateStyle: "short", timeStyle: "medium"}).format(new Date(value));
+    return new Intl.DateTimeFormat("ru-RU", {timeZone: CONFIG.TIME_ZONE, dateStyle: "short", timeStyle: "medium"}).format(new Date(value));
 }
 
 function text(value) {
@@ -196,7 +196,5 @@ function text(value) {
 }
 
 function todayValue() {
-    const now = new Date();
-    const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-    return local.toISOString().slice(0, 10);
+    return new Intl.DateTimeFormat("sv-SE", {timeZone: CONFIG.TIME_ZONE}).format(new Date());
 }

@@ -1,7 +1,6 @@
-from datetime import datetime
-
 from fastapi import Header, HTTPException
 
+from app.queue_time import utc_now
 from app.database import SessionLocal
 from app.models import Admin, AdminSession, Operator, UserSession
 
@@ -14,7 +13,7 @@ def verify_session(session_id: str = Header(...)):
             raise HTTPException(status_code=401, detail="Invalid session")
         # Refresh "online" activity on any authenticated request.
         # This makes cleanup tolerant to cases where WS heartbeats are temporarily missing.
-        session.last_seen = datetime.now()
+        session.last_seen = utc_now()
         db.commit()
         operator = db.query(Operator).filter(Operator.id == session.operator_id).first()
         if not operator:
@@ -36,7 +35,7 @@ def verify_admin_session(session_id: str = Header(None)):
         raise HTTPException(status_code=401, detail="Неверная сессия администратора")
     
     # Обновляем активность
-    session.last_seen = datetime.now()
+    session.last_seen = utc_now()
     db.commit()
 
     # Получаем данные администратора

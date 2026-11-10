@@ -1,11 +1,14 @@
 import os
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / "main.env", override=True)
+
+QUEUE_TIME_ZONE = ZoneInfo(os.getenv("QUEUE_TIMEZONE", "Asia/Irkutsk"))
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://localhost:5432/postgres")
 raw_cors_origins = os.getenv("CORS_ORIGINS", "http://localhost,http://127.0.0.1")

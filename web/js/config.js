@@ -1,6 +1,9 @@
 const WS_PROTOCOL = window.location.protocol === "https:" ? "wss:" : "ws:";
 
+const QUEUE_TIME_ZONE = document.querySelector('meta[name="queue-timezone"]').content;
+
 const CONFIG = {
+    TIME_ZONE: QUEUE_TIME_ZONE,
     API_URL: window.location.origin,
     WS_TERMINAL_URL: `${WS_PROTOCOL}//${window.location.host}/ws/terminal`,
     WS_BOARD_URL: `${WS_PROTOCOL}//${window.location.host}/ws/board`,

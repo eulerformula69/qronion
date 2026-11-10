@@ -3,6 +3,7 @@ import re
 from starlette.requests import Request
 from starlette.responses import Response
 
+from app.config import QUEUE_TIME_ZONE
 from app.release import get_release_version
 
 
@@ -25,6 +26,7 @@ def _version_html(content: bytes, version: str) -> bytes:
 
     content = ASSET_URL_RE.sub(add_version, content)
     marker = b'<meta name="app-version" content="' + encoded_version + b'">\n'
+    marker += f'<meta name="queue-timezone" content="{QUEUE_TIME_ZONE.key}">\n'.encode("ascii")
     return content.replace(b"</head>", marker + b"</head>", 1)
 
 

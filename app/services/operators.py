@@ -1,9 +1,10 @@
 import asyncio
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import Session
 
+from app.queue_time import utc_now
 from app.config import OPERATOR_SESSION_AUTO_CLEANUP_ENABLED, SESSION_TIMEOUT_SECONDS
 from app.connections import manager
 from app.database import SessionLocal
@@ -161,7 +162,7 @@ async def cleanup_sessions():
         db: Session = SessionLocal()
         try:
             settings = get_system_settings_dict(db)
-            timeout_datetime = datetime.now() - timedelta(seconds=SESSION_TIMEOUT_SECONDS)
+            timeout_datetime = utc_now() - timedelta(seconds=SESSION_TIMEOUT_SECONDS)
             mapped_session_ids = list(manager.session_id_to_ws.keys())
             ws_alive_operator_ids = set()
             ws_alive_admin_ids = set()
@@ -195,7 +196,7 @@ async def cleanup_sessions():
 
                 for session in dead_sessions:
                     if session.operator_id in ws_alive_operator_ids:
-                        session.last_seen = datetime.now()
+                        session.last_seen = utc_now()
                         continue
 
                     other_alive = db.query(UserSession).filter(
@@ -246,7 +247,7 @@ async def cleanup_sessions():
                 print(f"[Cleanup] Найдено мертвых сессий админов: {len(dead_admin_sessions)}")
                 for a_session in dead_admin_sessions:
                     if a_session.admin_id in ws_alive_admin_ids:
-                        a_session.last_seen = datetime.now()
+                        a_session.last_seen = utc_now()
                         continue
 
                     db.delete(a_session)

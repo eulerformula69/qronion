@@ -89,7 +89,6 @@ def test_current_ticket_api_returns_server_authoritative_countdowns():
 
     assert 'ticket_payload["finish_remaining_seconds"]' in current_endpoint
     assert 'ticket_payload["recall_remaining_seconds"]' in current_endpoint
-    assert 'now = datetime.now()' in current_endpoint
 
 
 def test_recall_response_returns_fresh_server_countdown():

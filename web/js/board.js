@@ -72,8 +72,8 @@ function connectWS() {
 function updateClock() {
     const clockElement = document.getElementById("clock-container");
     const now = new Date();
-    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    const dateOptions = { timeZone: CONFIG.TIME_ZONE, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const timeOptions = { timeZone: CONFIG.TIME_ZONE, hour: '2-digit', minute: '2-digit', second: '2-digit' };
     const dateString = now.toLocaleDateString('ru-RU', dateOptions);
     const timeString = now.toLocaleTimeString('ru-RU', timeOptions);
     const formattedDate = dateString.charAt(0).toUpperCase() + dateString.slice(1);

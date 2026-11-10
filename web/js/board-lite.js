@@ -101,6 +101,8 @@
         return null;
     }
 
+    var queueOffsetSeconds = null;
+
     function updateClock() {
         var el = byId("clock-container");
         var now;
@@ -112,7 +114,9 @@
         now = new Date();
 
         try {
+            if (typeof Intl === "undefined" || !Intl.DateTimeFormat) throw new Error("Intl unavailable");
             dateString = now.toLocaleDateString("ru-RU", {
+                timeZone: CONFIG.TIME_ZONE,
                 weekday: "long",
                 year: "numeric",
                 month: "long",
@@ -120,6 +124,7 @@
             });
 
             timeString = now.toLocaleTimeString("ru-RU", {
+                timeZone: CONFIG.TIME_ZONE,
                 hour: "2-digit",
                 minute: "2-digit",
                 second: "2-digit"
@@ -128,7 +133,10 @@
             dateString = dateString.charAt(0).toUpperCase() + dateString.slice(1);
             el.innerHTML = escapeHtml(dateString + " " + timeString);
         } catch (e) {
-            el.innerHTML = escapeHtml(now.toLocaleString());
+            if (queueOffsetSeconds !== null) {
+                var local = new Date(now.getTime() + queueOffsetSeconds * 1000);
+                el.textContent = local.toISOString().slice(0, 19).replace("T", " ");
+            }
         }
     }
 
@@ -371,6 +379,7 @@
     }
 
     function normalizeBoardState(data) {
+        if (data && typeof data.utc_offset_seconds === "number") queueOffsetSeconds = data.utc_offset_seconds;
         if (data && (data.type === "board_state" || Object.prototype.toString.call(data.called) === "[object Array]" || Object.prototype.toString.call(data.waiting) === "[object Array]")) {
             if (typeof window.setBoardSystemMessages === "function") {
                 window.setBoardSystemMessages(Object.prototype.toString.call(data.cancelled) === "[object Array]" ? data.cancelled : []);

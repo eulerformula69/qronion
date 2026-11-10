@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import or_, text
 
+from app.queue_time import utc_now
 from app.connections import manager
 from app.database import SessionLocal
 from app.models import Operator, Ticket, Window, WindowService
@@ -46,7 +47,7 @@ def _has_waiting_ticket_for_operator(db, operator: Operator) -> bool:
 
 async def run_auto_dispatch_once(*, now: datetime | None = None) -> int:
     """Reconcile deadlines and dispatch every operator that is due."""
-    current_time = now or datetime.now()
+    current_time = now or utc_now()
     dispatched: list[tuple[Ticket, Window]] = []
     deadlines_created = False
     db = SessionLocal()

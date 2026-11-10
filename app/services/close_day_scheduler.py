@@ -2,7 +2,7 @@
 
 import asyncio
 from datetime import datetime
-from zoneinfo import ZoneInfo
+from app.config import QUEUE_TIME_ZONE
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -13,7 +13,6 @@ from app.services.close_day import close_day
 from app.services.tickets import broadcast_board
 
 
-LOCAL_TIMEZONE = ZoneInfo("Asia/Irkutsk")
 POLL_SECONDS = 20
 
 
@@ -42,6 +41,7 @@ def serialize_schedule(schedule: CloseDaySchedule) -> dict:
 
 def claim_due_schedule(db, now: datetime) -> dict | None:
     schedule = get_or_create_schedule(db)
+    now = now.astimezone(QUEUE_TIME_ZONE)
     today = now.date().isoformat()
     if not schedule.enabled or now.weekday() not in serialize_schedule(schedule)["weekdays"]:
         return None
@@ -56,7 +56,7 @@ async def run_due_close_day(now: datetime | None = None) -> bool:
     db = SessionLocal()
     schedule = None
     try:
-        current = now or datetime.now(LOCAL_TIMEZONE)
+        current = now or datetime.now(QUEUE_TIME_ZONE)
         schedule = claim_due_schedule(db, current)
         if not schedule:
             return False

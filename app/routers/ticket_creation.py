@@ -1,9 +1,10 @@
 import json
-from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 
+from app.config import QUEUE_TIME_ZONE
+from app.queue_time import utc_now
 from app.connections import manager
 from app.database import SessionLocal
 from app.dependencies import get_current_terminal
@@ -101,7 +102,7 @@ async def create_ticket(
             target_window_id = ticket.window_id
 
         # 3. Создаем тикет
-        created_at = datetime.now()
+        created_at = utc_now()
         db_ticket = Ticket(
             service_id=service.id,
             status="waiting",
@@ -128,7 +129,7 @@ async def create_ticket(
             "number": db_ticket.number,
             "service_name": service.name,
             "waiting_before": waiting_before,
-            "date": created_at.strftime("%d.%m.%Y %H:%M")
+            "date": created_at.astimezone(QUEUE_TIME_ZONE).strftime("%d.%m.%Y %H:%M")
         }
         if request_key:
             db.add(TicketCreationRequest(

@@ -117,7 +117,7 @@ def test_initial_schema_matches_models(empty_database):
 def test_packaged_install_runs_cli_outside_repository(empty_database, tmp_path):
     # Mimic the migration files copied by the VM installer, with its own config.
     (tmp_path / 'app').mkdir()
-    for name in ['__init__.py', 'config.py', 'database.py', 'models.py', 'schema.py']:
+    for name in ['__init__.py', 'config.py', 'database.py', 'queue_time.py', 'models.py', 'schema.py']:
         shutil.copy2(ROOT / 'app' / name, tmp_path / 'app' / name)
     shutil.copy2(ROOT / 'alembic.ini', tmp_path)
     shutil.copytree(ROOT / 'migrations', tmp_path / 'migrations', ignore=shutil.ignore_patterns('__pycache__'))
@@ -159,7 +159,7 @@ def test_later_revision_preserves_existing_records(empty_database, tmp_path):
     revision = tmp_path / 'migrations' / 'versions' / '0002_test.py'
     revision.write_text(
         "from alembic import op\n"
-        "revision = '0002_test'\ndown_revision = '0001_initial'\n"
+        "revision = '0002_test'\ndown_revision = '0002_utc'\n"
         "def upgrade():\n    op.execute('ALTER TABLE tickets ADD COLUMN test_note varchar')\n",
         encoding='utf-8',
     )

@@ -27,7 +27,7 @@ function render() {
                     <div>
                         <span class="admin-scheduler-eyebrow">Закрытие смены</span>
                         <h2>${schedule.enabled ? "Расписание активно" : "Расписание выключено"}</h2>
-                        <p>Выполняется на сервере по времени Иркутска. Админку можно закрыть.</p>
+                        <p>Выполняется на сервере по времени очереди (${CONFIG.TIME_ZONE}). Админку можно закрыть.</p>
                     </div>
                     <label class="admin-scheduler-enabled">
                         <span>Включено</span>

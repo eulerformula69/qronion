@@ -1,10 +1,10 @@
 import json
-from datetime import datetime
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 from starlette.websockets import WebSocketState
 
+from app.queue_time import utc_now
 from app.connections import manager
 from app.database import SessionLocal
 from app.models import AdminSession, UserSession
@@ -65,7 +65,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         ).first()
 
                     if session:
-                        session.last_seen = datetime.now()
+                        session.last_seen = utc_now()
                         db.commit()
                         # Сохраняем mapping сокет -> session_id
                         ws_id = id(websocket)

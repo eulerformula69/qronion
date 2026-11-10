@@ -8,6 +8,8 @@ from alembic.migration import MigrationContext
 from alembic.script import ScriptDirectory
 from sqlalchemy import inspect, text
 
+from app.config import QUEUE_TIME_ZONE
+
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -21,6 +23,14 @@ def upgrade_schema(engine):
     with engine.connect() as connection:
         config.attributes["connection"] = connection
         command.upgrade(config, "head")
+        connection.execute(text("""
+            UPDATE ticket_counter_state
+            SET timezone = :zone, current_day = (
+                COALESCE((SELECT max(created_at) FROM tickets), CURRENT_TIMESTAMP) AT TIME ZONE :zone
+            )::date
+            WHERE timezone <> :zone
+        """), {"zone": QUEUE_TIME_ZONE.key})
+        connection.commit()
 
 
 def check_schema(engine):
@@ -51,6 +61,10 @@ def check_schema(engine):
         """)).scalar_one()
         if "ticket_counter_state" not in existing or not numbering:
             raise RuntimeError("Нумерация талонов не настроена. Восстановите структуру базы.")
+
+        zone = connection.execute(text("SELECT timezone FROM ticket_counter_state WHERE id = 1")).scalar_one()
+        if zone != QUEUE_TIME_ZONE.key:
+            raise RuntimeError("Изменён часовой пояс очереди. Выполните python -m app.schema upgrade.")
 
 
 def main():

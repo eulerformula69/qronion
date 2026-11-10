@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from app.queue_time import utc_now
 from app.models import Ticket
 
 
@@ -27,4 +28,4 @@ def start_ticket_service(
 
     ticket.status = "serving"
     ticket.operator_id = operator_id
-    ticket.service_started_at = now or datetime.now()
+    ticket.service_started_at = now or utc_now()

@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from operator import eq, ge, lt
 
+from app.config import QUEUE_TIME_ZONE
+
 import pytest
 from fastapi import HTTPException
 
@@ -71,17 +73,17 @@ def make_ticket(number, created_at, service_name="Service", **kwargs):
 
 
 def test_build_reprint_ticket_payload_finds_today_ticket():
-    now = datetime(2026, 6, 29, 12, 0)
+    now = datetime(2026, 6, 29, 12, 0, tzinfo=QUEUE_TIME_ZONE)
     ticket = make_ticket(
         42,
-        datetime(2026, 6, 29, 9, 30),
+        datetime(2026, 6, 29, 9, 30, tzinfo=QUEUE_TIME_ZONE),
         service_name="Consultation",
         id=10,
         window_id=3,
         operator_id=7,
     )
-    waiting_before = make_ticket(41, datetime(2026, 6, 29, 9, 20), id=9)
-    finished_before = make_ticket(40, datetime(2026, 6, 29, 9, 10), id=8, status="finished")
+    waiting_before = make_ticket(41, datetime(2026, 6, 29, 9, 20, tzinfo=QUEUE_TIME_ZONE), id=9)
+    finished_before = make_ticket(40, datetime(2026, 6, 29, 9, 10, tzinfo=QUEUE_TIME_ZONE), id=8, status="finished")
 
     payload = build_reprint_ticket_payload(
         FakeDb([ticket, waiting_before, finished_before]),
@@ -102,7 +104,7 @@ def test_build_reprint_ticket_payload_finds_today_ticket():
 
 
 def test_build_reprint_ticket_payload_raises_when_ticket_missing():
-    now = datetime(2026, 6, 29, 12, 0)
+    now = datetime(2026, 6, 29, 12, 0, tzinfo=QUEUE_TIME_ZONE)
 
     with pytest.raises(HTTPException) as exc_info:
         build_reprint_ticket_payload(FakeDb([]), 42, now=now)
@@ -112,7 +114,7 @@ def test_build_reprint_ticket_payload_raises_when_ticket_missing():
 
 
 def test_build_reprint_ticket_payload_does_not_find_yesterday_ticket():
-    now = datetime(2026, 6, 29, 12, 0)
+    now = datetime(2026, 6, 29, 12, 0, tzinfo=QUEUE_TIME_ZONE)
     yesterday_ticket = make_ticket(42, now - timedelta(days=1), id=10)
 
     with pytest.raises(HTTPException) as exc_info:

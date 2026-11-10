@@ -21,8 +21,9 @@ from fastapi.responses import FileResponse
 from sqlalchemy import and_, asc, func, literal
 from sqlalchemy.orm import Session
 
+from app.queue_time import today_bounds, utc_now
 from app.config import (
-    ALLOWED_MEDIA_EXTENSIONS, BASE_DIR, DEFAULT_PAGE_LIMIT, MAX_FILE_SIZE,
+    ALLOWED_MEDIA_EXTENSIONS, BASE_DIR, DEFAULT_PAGE_LIMIT, MAX_FILE_SIZE, QUEUE_TIME_ZONE,
     MAX_PAGE_LIMIT, PIPER_MODEL, PIPER_PATH, SESSION_TIMEOUT_SECONDS,
     TTS_CACHE_DIR, TTS_LENGTH_SCALE,
     TTS_NOISE_SCALE, TTS_NOISE_W_SCALE,
@@ -127,7 +128,7 @@ def build_operator_queue_ticket_payload(ticket, operator_window_id: int | None) 
         "number": ticket.number,
         "service_id": ticket.service_id,
         "service_name": ticket.service_name or "Неизвестно",
-        "created_at": ticket.created_at.strftime("%H:%M") if ticket.created_at else "—",
+        "created_at": ticket.created_at.astimezone(QUEUE_TIME_ZONE).strftime("%H:%M") if ticket.created_at else "—",
         "priority": getattr(ticket, "priority", None),
         "target_window_id": ticket.target_window_id,
         "is_redirected_to_window": is_ticket_redirected_to_operator_window(
@@ -138,7 +139,7 @@ def build_operator_queue_ticket_payload(ticket, operator_window_id: int | None) 
 
 
 def _format_ticket_time(value) -> str:
-    return value.strftime("%H:%M") if value else "—"
+    return value.astimezone(QUEUE_TIME_ZONE).strftime("%H:%M") if value else "—"
 
 
 def build_operator_ticket_detail_payload(ticket: Ticket) -> dict:
@@ -182,19 +183,12 @@ def get_served_operator_tickets(
     )
 
 
-def _today_bounds(now: datetime | None = None):
-    current = now or datetime.now()
-    today_start = current.replace(hour=0, minute=0, second=0, microsecond=0)
-    tomorrow_start = today_start + timedelta(days=1)
-    return today_start, tomorrow_start
-
-
 def build_reprint_ticket_payload(
     db: Session,
     number: int,
     now: datetime | None = None,
 ) -> dict:
-    today_start, tomorrow_start = _today_bounds(now)
+    today_start, tomorrow_start = today_bounds(now)
 
     ticket = (
         db.query(Ticket)
@@ -224,7 +218,7 @@ def build_reprint_ticket_payload(
         "number": ticket.number,
         "service_name": ticket.service.name if ticket.service else "Услуга не найдена",
         "waiting_before": waiting_before,
-        "date": ticket.created_at.strftime("%d.%m.%Y %H:%M") if ticket.created_at else "",
+        "date": ticket.created_at.astimezone(QUEUE_TIME_ZONE).strftime("%d.%m.%Y %H:%M") if ticket.created_at else "",
     }
 
 
@@ -284,7 +278,7 @@ async def finish_ticket(operator: Operator = Depends(verify_session)):
     ticket.completion_reason = "completed"
     if ticket.operator_id is None:
         ticket.operator_id = operator.id
-    ticket.finished_at = datetime.now() #text("CURRENT_TIMESTAMP")
+    ticket.finished_at = utc_now()
 
     db.commit()
     db.refresh(ticket)
@@ -418,8 +412,7 @@ async def call_specific_ticket(data: CallSpecificRequest, operator: Operator = D
             return {"detail": f"Сначала завершите клиента: {current.number}"}
 
         # Ищем билет по номеру только за сегодняшний день
-        today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        tomorrow_start = today_start + timedelta(days=1)
+        today_start, tomorrow_start = today_bounds()
 
         ticket = db.query(Ticket).filter(
             Ticket.number == data.number,
@@ -454,7 +447,7 @@ async def call_specific_ticket(data: CallSpecificRequest, operator: Operator = D
         ticket.operator_id = operator.id
         ticket.window_id = operator.window_id
         ticket.target_window_id = None
-        ticket.called_at = datetime.now()
+        ticket.called_at = utc_now()
         ticket.service_started_at = None
         ticket.last_recalled_at = None
         ticket.finished_at = None
@@ -739,7 +732,7 @@ async def cancel_operator_deferred_ticket(
         )
         ticket.defer_reason = None
         ticket.deferred_at = None
-        ticket.finished_at = datetime.now()
+        ticket.finished_at = utc_now()
 
         db.commit()
         db.refresh(ticket)
@@ -832,12 +825,12 @@ def get_my_queue(
 
         tickets = (redirected_query.all() + ordinary_query.all())[skip:skip + limit]
 
-        today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        tomorrow_start = today_start + timedelta(days=1)
+        today_start, tomorrow_start = today_bounds()
         tickets_served_today = db.query(Ticket).filter(
             Ticket.window_id == operator.window_id,
             Ticket.status == "finished",
-            Ticket.finished_at >= today_start
+            Ticket.finished_at >= today_start,
+            Ticket.finished_at < tomorrow_start,
         ).count()
 
         result = []
@@ -1073,7 +1066,7 @@ async def redirect_ticket(data: RedirectRequest, operator: Operator = Depends(ve
             redirect_called_ticket(ticket, service_id=service.id)
             redirected_ticket = ticket
         else:
-            redirected_at = datetime.now()
+            redirected_at = utc_now()
             root_ticket_id = ticket.root_ticket_id or ticket.id
 
             ticket.status = "finished"
@@ -1133,7 +1126,7 @@ async def recall_ticket(operator: Operator = Depends(verify_session)):
         if not ticket:
             raise HTTPException(status_code=404, detail="Нет активного клиента для повторного вызова")
 
-        now = datetime.now()
+        now = utc_now()
         remaining_seconds = recall_cooldown_remaining_seconds(ticket, now=now)
         if remaining_seconds:
             raise HTTPException(
@@ -1204,7 +1197,7 @@ def get_current_ticket(operator: Operator = Depends(verify_session)):
         if not ticket:
             return {"ticket": None}
 
-        now = datetime.now()
+        now = utc_now()
         settings = get_system_settings_dict(db)
         ticket_payload = jsonable_encoder(ticket)
         ticket_payload["finish_remaining_seconds"] = (

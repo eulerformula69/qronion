@@ -1,10 +1,12 @@
 import asyncio
 import math
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import case, func, text
 from sqlalchemy.orm import Session
 
+from app.queue_time import today_bounds, utc_now
+from app.config import QUEUE_TIME_ZONE
 from app.connections import manager
 from app.database import SessionLocal
 from app.models import (
@@ -25,7 +27,7 @@ def called_ticket_wait_remaining_seconds(
     """Return the server-authoritative minimum service time remaining."""
     if not ticket.service_started_at:
         return 0
-    current_time = now or datetime.now()
+    current_time = now or utc_now()
     available_at = ticket.service_started_at + timedelta(
         seconds=max(0, min_wait_seconds)
     )
@@ -44,7 +46,7 @@ def recall_cooldown_remaining_seconds(
     if not call_times:
         return 0
     available_at = max(call_times) + timedelta(seconds=RECALL_COOLDOWN_SECONDS)
-    return max(0, math.ceil((available_at - (now or datetime.now())).total_seconds()))
+    return max(0, math.ceil((available_at - (now or utc_now())).total_seconds()))
 
 
 def queue_order_expr():
@@ -114,8 +116,7 @@ def low_load_auto_call_winner(
     if len(candidates) < settings["auto_call_balance_min_free_operators"]:
         return None
 
-    current_time = now or datetime.now()
-    today_start = current_time.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start, _ = today_bounds(now)
     ranking = []
     for candidate in candidates:
         completed_count = db.query(Ticket).filter(
@@ -136,8 +137,8 @@ def low_load_auto_call_winner(
         ).scalar()
         ranking.append((
             completed_count,
-            last_finished_at or datetime.min,
-            online_started_at or datetime.min,
+            last_finished_at or datetime.min.replace(tzinfo=UTC),
+            online_started_at or datetime.min.replace(tzinfo=UTC),
             candidate.id,
         ))
     return select_low_load_winner_id(ranking)
@@ -218,7 +219,7 @@ def claim_next_ticket(
     ticket.operator_id = operator.id
     ticket.window_id = operator.window_id
     ticket.target_window_id = None
-    ticket.called_at = called_at or datetime.now()
+    ticket.called_at = called_at or utc_now()
     ticket.service_started_at = None
     ticket.last_recalled_at = None
     ticket.finished_at = None
@@ -230,7 +231,7 @@ def claim_next_ticket(
 
 
 def return_ticket_to_queue(ticket: Ticket, *, now: datetime | None = None):
-    returned_at = now or datetime.now()
+    returned_at = now or utc_now()
 
     ticket.status = "waiting"
     ticket.completion_reason = None
@@ -254,7 +255,7 @@ def defer_ticket(
     reason: str,
     now: datetime | None = None,
 ) -> None:
-    deferred_at = now or datetime.now()
+    deferred_at = now or utc_now()
 
     ticket.status = "deferred"
     ticket.completion_reason = None
@@ -274,7 +275,7 @@ def resume_ticket_to_service(
     window_id: int,
     now: datetime | None = None,
 ) -> None:
-    called_at = now or datetime.now()
+    called_at = now or utc_now()
 
     ticket.status = "called"
     ticket.completion_reason = None
@@ -297,7 +298,7 @@ def resume_deferred_ticket(
     window_id: int,
     now: datetime | None = None,
 ) -> None:
-    service_started_at = now or datetime.now()
+    service_started_at = now or utc_now()
     ticket.status = "serving"
     ticket.completion_reason = None
     ticket.operator_id = operator_id
@@ -334,7 +335,7 @@ def create_window_redirect_ticket(
     service_id: int | None = None,
     now: datetime | None = None,
 ) -> Ticket:
-    redirected_at = now or datetime.now()
+    redirected_at = now or utc_now()
     root_ticket_id = ticket.root_ticket_id or ticket.id
     redirect_count = (ticket.returned_to_queue_count or 0) + 1
 
@@ -371,7 +372,7 @@ def redirect_called_ticket(
     now: datetime | None = None,
 ) -> None:
     """Move a called ticket without preserving a separate completed stage."""
-    redirected_at = now or datetime.now()
+    redirected_at = now or utc_now()
 
     ticket.service_id = service_id
     ticket.status = "waiting"
@@ -471,7 +472,7 @@ def get_recent_cancelled_tickets_for_board():
         display_seconds = settings["cancelled_ticket_board_display_seconds"]
         if display_seconds <= 0:
             return []
-        cutoff = datetime.now() - timedelta(seconds=display_seconds)
+        cutoff = utc_now() - timedelta(seconds=display_seconds)
         rows = (
             db.query(Ticket, Window)
             .outerjoin(Window, Ticket.window_id == Window.id)
@@ -501,6 +502,7 @@ def get_recent_cancelled_tickets_for_board():
 def get_board_state():
     return {
         "type": "board_state",
+        "utc_offset_seconds": int(utc_now().astimezone(QUEUE_TIME_ZONE).utcoffset().total_seconds()),
         "called": get_called_tickets(),
         "waiting": get_waiting_tickets_for_board(),
         "cancelled": get_recent_cancelled_tickets_for_board(),
@@ -598,7 +600,7 @@ async def broadcast_ticket_called(ticket: Ticket, window: Window):
     if called_at_value:
         call_id = f"{ticket.id}:{called_at_value}"
     else:
-        call_id = f"{ticket.id}:{datetime.now().timestamp()}"
+        call_id = f"{ticket.id}:{utc_now().timestamp()}"
 
     await manager.broadcast(build_ticket_called_event(
         ticket,

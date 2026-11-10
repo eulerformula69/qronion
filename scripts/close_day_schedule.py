@@ -5,10 +5,10 @@ from __future__ import annotations
 import time
 from datetime import datetime
 from typing import Callable
-from zoneinfo import ZoneInfo
+
+from app.config import QUEUE_TIME_ZONE as LOCAL_TIMEZONE
 
 
-LOCAL_TIMEZONE = ZoneInfo("Asia/Irkutsk")
 INPUT_FORMAT = "%d.%m.%Y %H:%M"
 MAX_SLEEP_SECONDS = 30
 
@@ -27,7 +27,9 @@ def parse_run_at(value: str, *, now: datetime | None = None) -> datetime:
     current_time = now or datetime.now(LOCAL_TIMEZONE)
     if current_time.tzinfo is None:
         current_time = current_time.replace(tzinfo=LOCAL_TIMEZONE)
-    if run_at <= current_time.astimezone(LOCAL_TIMEZONE):
+    if datetime.fromtimestamp(run_at.timestamp(), LOCAL_TIMEZONE) != run_at:
+        raise ValueError("местное время пропущено при переводе часов")
+    if run_at.timestamp() <= current_time.timestamp():
         raise ValueError("дата и время должны быть в будущем")
     return run_at
 
@@ -56,7 +58,7 @@ def wait_until(
     """Wait until a scheduled moment while checking the clock regularly."""
     get_now = now_func or (lambda: datetime.now(LOCAL_TIMEZONE))
     while True:
-        remaining = (run_at - get_now().astimezone(LOCAL_TIMEZONE)).total_seconds()
+        remaining = run_at.timestamp() - get_now().timestamp()
         if remaining <= 0:
             return
         sleep_func(min(remaining, MAX_SLEEP_SECONDS))
@@ -71,7 +73,7 @@ def run_schedule(
     """Wait for each moment and run Close Day once at every scheduled time."""
     exit_code = 0
     for run_at in sorted(run_times):
-        print(f"Следующее закрытие: {run_at:%d.%m.%Y в %H:%M} (Иркутск)")
+        print(f"Следующее закрытие: {run_at:%d.%m.%Y в %H:%M} ({LOCAL_TIMEZONE.key})")
         wait_func(run_at)
         print(f"Запускаю Close Day: {run_at:%d.%m.%Y в %H:%M}")
         result = close_day_func()

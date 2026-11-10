@@ -703,6 +703,7 @@ document.getElementById("ticket-notice-close").addEventListener("click", closeNo
 
 function formatReceiptDate(date = new Date()) {
     const dateOptions = {
+        timeZone: CONFIG.TIME_ZONE,
         weekday: 'long',
         day: 'numeric',
         month: 'long',

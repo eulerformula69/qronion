@@ -1,5 +1,4 @@
-from datetime import datetime
-
+from app.queue_time import utc_now
 from app.connections import manager
 from app.models import Admin, Ticket, TicketAdminChange
 from app.services.settings import normalize_ticket_reason
@@ -33,7 +32,7 @@ def cancel_ticket(
     ticket.status = "cancelled"
     ticket.completion_reason = "cancelled"
     ticket.cancel_reason = normalized_reason
-    ticket.finished_at = datetime.now()
+    ticket.finished_at = utc_now()
     if ticket.operator_id is None and operator_id is not None:
         ticket.operator_id = operator_id
 
@@ -56,7 +55,7 @@ async def publish_ticket_updated(ticket_payload: dict, previous_status: str) -> 
         "status": ticket_payload["status"],
         "previousStatus": previous_status,
         "ticket": ticket_payload,
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
     await manager.broadcast(event)
     await manager.broadcast({"type": "queue_updated"})

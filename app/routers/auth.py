@@ -6,7 +6,7 @@ import re
 import secrets
 import shutil
 import subprocess
-from datetime import datetime, timedelta
+from datetime import timedelta
 from pathlib import Path as FilePath
 from typing import List
 
@@ -20,6 +20,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import and_, asc, func, literal, text
 from sqlalchemy.orm import Session
 
+from app.queue_time import utc_now
 from app.config import (
     ALLOWED_MEDIA_EXTENSIONS, BASE_DIR, DEFAULT_PAGE_LIMIT, MAX_FILE_SIZE,
     MAX_PAGE_LIMIT, OPERATOR_SESSION_AUTO_CLEANUP_ENABLED, PIPER_MODEL,
@@ -53,7 +54,7 @@ async def login(data: LoginRequest):
     db = SessionLocal()
     try:
         settings = get_system_settings_dict(db)
-        now = datetime.now()
+        now = utc_now()
         timeout_datetime = now - timedelta(seconds=SESSION_TIMEOUT_SECONDS)
 
         # 1. Админы / терминалы
@@ -287,7 +288,7 @@ async def ping(data: PingRequest):
             session = db.query(AdminSession).filter(AdminSession.session_id == data.session_id).first()
 
         if session:
-            session.last_seen = datetime.now()
+            session.last_seen = utc_now()
             db.commit()
             return {"status": "ok"}
         else:

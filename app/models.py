@@ -1,11 +1,10 @@
-from datetime import datetime
-
 from sqlalchemy import (
     BigInteger, CheckConstraint, Column, ForeignKey, Index, Integer, String,
     TIMESTAMP, UniqueConstraint, func, text,
 )
 from sqlalchemy.orm import Session, relationship
 
+from app.queue_time import utc_now
 from app.database import Base
 
 
@@ -81,21 +80,21 @@ class Ticket(Base):
     window_id = Column(Integer, nullable=True)
     target_window_id = Column(Integer, ForeignKey("windows.id"), nullable=True)
     created_at = Column(
-        TIMESTAMP,
-        server_default=text("(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Irkutsk')"),
+        TIMESTAMP(timezone=True),
+        server_default=text("CURRENT_TIMESTAMP"),
     )
     queue_entered_at = Column(
-        TIMESTAMP,
-        server_default=text("(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Irkutsk')"),
+        TIMESTAMP(timezone=True),
+        server_default=text("CURRENT_TIMESTAMP"),
     )
     returned_to_queue_count = Column(Integer, nullable=False, default=0, server_default=text("0"))
     defer_reason = Column(String(255), nullable=True)
-    deferred_at = Column(TIMESTAMP, nullable=True)
+    deferred_at = Column(TIMESTAMP(timezone=True), nullable=True)
     cancel_reason = Column(String(255), nullable=True)
-    called_at = Column(TIMESTAMP, nullable=True)
-    service_started_at = Column(TIMESTAMP, nullable=True)
-    last_recalled_at = Column(TIMESTAMP, nullable=True)
-    finished_at = Column(TIMESTAMP, nullable=True)
+    called_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    service_started_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    last_recalled_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    finished_at = Column(TIMESTAMP(timezone=True), nullable=True)
 
     service = relationship("Service")
 
@@ -111,7 +110,7 @@ class Operator(Base):
     password = Column(String, nullable=False)
     window_id = Column(Integer, ForeignKey("windows.id"), unique=True)
     auto_call_mode = Column(String, default="default")
-    next_auto_call_at = Column(TIMESTAMP, nullable=True)
+    next_auto_call_at = Column(TIMESTAMP(timezone=True), nullable=True)
 
 
 class OperatorServiceNotification(Base):
@@ -139,8 +138,8 @@ class UserSession(Base):
     __tablename__ = "sessions"
     session_id = Column(String, primary_key=True) 
     operator_id = Column(Integer, ForeignKey("operators.id"))
-    created_at = Column(TIMESTAMP, server_default=text("NOW()"), nullable=False)
-    last_seen = Column(TIMESTAMP, server_default=text("NOW()"), nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("NOW()"), nullable=False)
+    last_seen = Column(TIMESTAMP(timezone=True), server_default=text("NOW()"), nullable=False)
     is_expirable = Column(Integer, default=1)
 
 
@@ -169,11 +168,11 @@ class OperatorStatusPeriod(Base):
     window_id = Column(Integer, ForeignKey("windows.id", ondelete="SET NULL"), nullable=True)
     status = Column(String(16), nullable=False)
     started_at = Column(
-        TIMESTAMP(timezone=False),
+        TIMESTAMP(timezone=True),
         nullable=False,
-        server_default=text("(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Irkutsk')"),
+        server_default=text("CURRENT_TIMESTAMP"),
     )
-    ended_at = Column(TIMESTAMP(timezone=False), nullable=True)
+    ended_at = Column(TIMESTAMP(timezone=True), nullable=True)
 
 
 def record_operator_status(
@@ -210,13 +209,13 @@ def record_operator_status(
         return current_period
 
     if current_period:
-        current_period.ended_at = func.timezone("Asia/Irkutsk", func.current_timestamp())
+        current_period.ended_at = func.current_timestamp()
 
     new_period = OperatorStatusPeriod(
         operator_id=operator_id,
         window_id=window_id,
         status=normalized_status,
-        started_at=func.timezone("Asia/Irkutsk", func.current_timestamp()),
+        started_at=func.current_timestamp(),
     )
     db.add(new_period)
     db.flush()
@@ -235,8 +234,8 @@ class AdminSession(Base):
     __tablename__ = "admin_sessions"
     session_id = Column(String, primary_key=True) 
     admin_id = Column(Integer, ForeignKey("admins.id"), unique=True, index=True) 
-    created_at = Column(TIMESTAMP, default=datetime.now)
-    last_seen = Column(TIMESTAMP, default=datetime.now)
+    created_at = Column(TIMESTAMP(timezone=True), default=utc_now)
+    last_seen = Column(TIMESTAMP(timezone=True), default=utc_now)
     is_expirable = Column(Integer, default=1)
 
 
@@ -256,9 +255,9 @@ class TicketAdminChange(Base):
     new_status = Column(String, nullable=False)
     reason = Column(String(255), nullable=True)
     changed_at = Column(
-        TIMESTAMP(timezone=False),
+        TIMESTAMP(timezone=True),
         nullable=False,
-        server_default=text("(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Irkutsk')"),
+        server_default=text("CURRENT_TIMESTAMP"),
     )
 
 

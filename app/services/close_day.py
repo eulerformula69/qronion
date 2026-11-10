@@ -26,7 +26,7 @@ def close_day(db, *, ticket_action: str, operator_action: str) -> CloseDayResult
 
     settings = get_system_settings_dict(db)
     db.execute(text("LOCK TABLE tickets, windows, sessions, operator_status_periods IN SHARE ROW EXCLUSIVE MODE"))
-    now = func.timezone("Asia/Irkutsk", func.current_timestamp())
+    now = func.current_timestamp()
 
     db.execute(text("""
         UPDATE tickets t SET operator_id = o.id FROM operators o

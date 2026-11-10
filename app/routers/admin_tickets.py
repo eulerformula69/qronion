@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import case, func
 from sqlalchemy.orm import aliased
 
+from app.queue_time import local_midnight
 from app.database import SessionLocal
 from app.dependencies import verify_admin_session
 from app.models import Admin, Operator, Service, Ticket, TicketAdminChange, Window
@@ -116,9 +117,9 @@ def list_admin_tickets(
         if window_id is not None:
             query = query.filter(Ticket.window_id == window_id)
         if created_from is not None:
-            query = query.filter(Ticket.created_at >= created_from)
+            query = query.filter(Ticket.created_at >= local_midnight(created_from))
         if created_to is not None:
-            query = query.filter(Ticket.created_at < created_to + timedelta(days=1))
+            query = query.filter(Ticket.created_at < local_midnight(created_to + timedelta(days=1)))
 
         total = query.order_by(None).with_entities(func.count(Ticket.id)).scalar()
         if sort == "current":

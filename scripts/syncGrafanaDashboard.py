@@ -9,6 +9,9 @@ from grafana_dashboard import normalize_dashboard_export, write_dashboard_json
 
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_DIR))
+from app.config import QUEUE_TIME_ZONE
+
 DASHBOARD_SOURCE = PROJECT_DIR / "data" / "statistics.json"
 DASHBOARD_DESTINATION = Path("/var/lib/grafana/dashboards/queue-statistics.json")
 def run_optional(command):
@@ -28,6 +31,7 @@ def main():
         payload = json.load(file)
 
     dashboard = normalize_dashboard_export(payload)
+    dashboard["timezone"] = QUEUE_TIME_ZONE.key
     write_dashboard_json(DASHBOARD_DESTINATION, dashboard)
 
     run_optional(["chown", "grafana:grafana", str(DASHBOARD_DESTINATION)])

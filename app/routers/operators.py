@@ -7,7 +7,7 @@ import re
 import secrets
 import shutil
 import subprocess
-from datetime import datetime, timedelta
+from datetime import timedelta
 from pathlib import Path as FilePath
 from typing import List
 
@@ -21,6 +21,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import and_, asc, func, literal, text
 from sqlalchemy.orm import Session
 
+from app.queue_time import utc_now
 from app.config import (
     ALLOWED_MEDIA_EXTENSIONS, BASE_DIR, DEFAULT_PAGE_LIMIT, MAX_FILE_SIZE,
     MAX_PAGE_LIMIT, PIPER_MODEL, PIPER_PATH, SESSION_TIMEOUT_SECONDS,
@@ -85,7 +86,7 @@ def get_auto_dispatch_state(operator: Operator = Depends(verify_session)):
                 .first()
             )
 
-        now = datetime.now()
+        now = utc_now()
         deadline = current_operator.next_auto_call_at
         remaining_seconds = None
         if deadline:
