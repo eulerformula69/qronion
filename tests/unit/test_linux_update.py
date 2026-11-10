@@ -234,3 +234,15 @@ def test_recovery_health_failure_keeps_journal_and_stops_service(installation):
     host.failure = None
     update.recover(project, state, host)
     assert host.running and not state.exists()
+
+
+def test_installation_path_for_new_and_existing_servers(tmp_path):
+    preferred = tmp_path / 'qronion'
+    legacy = tmp_path / 'queue' / 'queue_project'
+    assert update.installation_path(preferred, legacy) == preferred
+    legacy.mkdir(parents=True)
+    (legacy / 'main.env').touch()
+    assert update.installation_path(preferred, legacy) == legacy
+    preferred.mkdir()
+    (preferred / 'main.env').touch()
+    assert update.installation_path(preferred, legacy) == preferred

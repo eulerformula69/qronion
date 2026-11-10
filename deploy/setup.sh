@@ -13,9 +13,11 @@ if [[ ${ID:-} != ubuntu || ${VERSION_ID:-} != 24.04 || $(uname -m) != x86_64 ]];
     printf 'Нужна Ubuntu Server 24.04 LTS, x86-64.\n' >&2
     exit 1
 fi
-if [[ -f /home/queue/queue_project/deploy/menu.sh ]]; then
-    exec bash /home/queue/queue_project/deploy/menu.sh
-fi
+for project in /home/qronion /home/queue/queue_project; do
+    if [[ -f "${project}/deploy/menu.sh" && -f "${project}/.queue-installed" ]]; then
+        exec bash "${project}/deploy/menu.sh"
+    fi
+done
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y git ca-certificates

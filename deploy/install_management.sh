@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 SOURCE_DIR="${SOURCE_DIR:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)}"
-APP_DIR="${APP_DIR:-/home/queue/queue_project}"
+source "${SOURCE_DIR}/deploy/install_path.sh"
+APP_DIR="${APP_DIR:-$(qronion_install_path)}"
 APP_USER="${APP_USER:-queue}"
 for name in menu.sh linux_update.py install.sh install_management.sh; do
     if [[ "${SOURCE_DIR}" != "${APP_DIR}" ]]; then

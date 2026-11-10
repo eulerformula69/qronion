@@ -29,7 +29,7 @@ usage() {
   sudo queue-backup [опции]
 
 Опции:
-  --project-dir PATH   Каталог проекта (по умолчанию /home/queue/queue_project)
+  --project-dir PATH   Каталог проекта (по умолчанию /home/qronion для новой установки)
   --output-dir PATH    Каталог для дампов (по умолчанию /var/backups/queue/db)
   --keep-days N        Хранить дампы N дней (по умолчанию 14, 0 = не удалять старые)
   --label TEXT         Добавить метку к имени файла

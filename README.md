@@ -30,7 +30,7 @@ sudo bash deploy/menu.sh
 ```
 
 Установщик настраивает PostgreSQL, приложение, Nginx, HTTP, HTTPS и Grafana.
-Приложение размещается в `/home/queue/queue_project`.
+Приложение размещается в `/home/qronion`.
 Адреса страниц и пути к паролям и сертификату появятся в конце установки.
 Пользователь, запустивший установку через `sudo`, получает доступ к папке проекта.
 Пароли доступны в `~/queue-credentials.txt`, а при установке от root:
@@ -68,7 +68,7 @@ sudo qronion
 
 `qronion` запускает меню из установленной папки проекта. Команда создаётся
 установщиком в `/usr/local/bin/qronion` и работает из любой текущей папки.
-Переходить в `/home/queue/queue_project` для открытия меню не требуется.
+Переходить в `/home/qronion` для открытия меню не требуется.
 Само открытие меню ничего не устанавливает, не обновляет и не останавливает.
 
 Введите номер пункта и нажмите Enter:
@@ -89,7 +89,9 @@ sudo qronion
 
 ### Где хранятся приложение и данные
 
-Каталог установки фиксирован: `/home/queue/queue_project`.
+Новая установка размещает очередь в `/home/qronion`. Если очередь уже установлена
+в `/home/queue/queue_project`, меню и обновлятор продолжают использовать этот каталог.
+В командах ниже для такой установки подставьте прежний путь.
 Папка, из которой запустили установщик, не определяет место установки.
 Меню не предлагает выбирать другой каталог.
 
@@ -100,7 +102,7 @@ sudo qronion
 | `app/`, `main.py` | Серверная часть приложения |
 | `queue/` | Веб-интерфейс, медиафайлы и файлы синтеза речи |
 | `main.env` | Настройки сервера, включая адрес подключения к БД |
-| `venv/` | Python-окружение приложения. После управляемого обновления это ссылка на окружение в `/home/queue/queue-environments/` |
+| `venv/` | Python-окружение приложения. После управляемого обновления это ссылка на окружение в `/home/qronion/.environments/` |
 | `queue/media/` | Загруженные медиафайлы |
 | `queue/tts/` | Модель речи и кэш сгенерированных фраз |
 | `data/map.json` | Локальная карта |
@@ -129,7 +131,7 @@ sudo -u postgres psql -Atc 'SHOW data_directory;'
 | `~/queue-rootCA.pem` | Корневой сертификат для установки на клиентские устройства при запуске установщика через `sudo` |
 | `/root/queue-rootCA.pem` | Экспорт корневого сертификата на сервере |
 
-Папка PostgreSQL не входит в `/home/queue/queue_project`.
+Папка PostgreSQL не входит в `/home/qronion`.
 Копирование одной папки приложения не создаёт резервную копию работающей БД.
 
 ### Как работает обновление
@@ -183,7 +185,7 @@ sudo -u postgres psql -Atc 'SHOW data_directory;'
 Если новое меню уже находится в установленной папке, откройте его напрямую:
 
 ```bash
-sudo bash /home/queue/queue_project/deploy/menu.sh
+sudo bash /home/qronion/deploy/menu.sh
 ```
 
 Для существующей установки с миграциями Alembic, в которой ещё нет нового меню, перенесите
@@ -317,7 +319,7 @@ git diff -- data/statistics.json
 `sudo qronion`. Следующие команды предназначены для ручного обслуживания:
 
 ```bash
-cd /home/queue/queue_project
+cd /home/qronion
 ./deploy/update_from_git.py --repo https://github.com/USER/REPOSITORY.git
 ./deploy/update_from_git.py --repo https://github.com/USER/REPOSITORY.git --apply
 ```
@@ -342,7 +344,7 @@ cd /home/queue/queue_project
 Все команды ниже — **на сервере**, из каталога проекта:
 
 ```bash
-cd /home/queue/queue_project
+cd /home/qronion
 ```
 
 ### Первый раз: подготовка на сервере
@@ -358,13 +360,13 @@ cd /home/queue/queue_project
 sudo install -d -m 0770 -o root -g queue /var/backups/queue/db
 
 # 4. Проверочный бэкап — работает сразу, без queue-backup
-sudo bash /home/queue/queue_project/deploy/backup_db.sh
+sudo bash /home/qronion/deploy/backup_db.sh
 ```
 
 Чтобы появились короткие команды `queue-backup` и `queue-restore`, один раз перезапустите установщик (данные и `main.env` сохранятся):
 
 ```bash
-cd /home/queue/queue_project
+cd /home/qronion
 sudo bash deploy/install.sh
 ```
 
@@ -432,7 +434,7 @@ sudo queue-backup
 Или без обёртки (если `queue-backup` ещё не установлен):
 
 ```bash
-sudo bash /home/queue/queue_project/deploy/backup_db.sh
+sudo bash /home/qronion/deploy/backup_db.sh
 ```
 
 Дополнительные варианты:
@@ -459,7 +461,7 @@ ls -lh /var/backups/queue/db/
 ### Перед обновлением проекта из Git
 
 ```bash
-cd /home/queue/queue_project
+cd /home/qronion
 
 sudo queue-backup --label before_update
 
@@ -470,7 +472,7 @@ sudo queue-backup --label before_update
 Если `queue-backup` ещё нет:
 
 ```bash
-sudo bash /home/queue/queue_project/deploy/backup_db.sh --label before_update
+sudo bash /home/qronion/deploy/backup_db.sh --label before_update
 ```
 
 ### Восстановление из дампа
@@ -496,7 +498,7 @@ sudo queue-restore /var/backups/queue/db/queue_20250624_031500.dump -y
 Через полный путь к скрипту:
 
 ```bash
-sudo bash /home/queue/queue_project/deploy/restore_db.sh /var/backups/queue/db/queue_20250624_031500.dump
+sudo bash /home/qronion/deploy/restore_db.sh /var/backups/queue/db/queue_20250624_031500.dump
 ```
 
 Проверка, что восстановление вообще работает (на уже сделанном тестовом дампе):

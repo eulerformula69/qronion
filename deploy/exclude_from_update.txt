@@ -32,3 +32,4 @@ backup_update_*/
 queue/tts/
 queue/media/
 data/map.json
+.environments/

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
 SOURCE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_DIR=/home/queue/queue_project
+source "${SOURCE_DIR}/deploy/install_path.sh"
+APP_DIR="$(qronion_install_path)"
 
 if [[ ${EUID} -ne 0 ]]; then
     printf 'Запустите меню через sudo: sudo bash deploy/menu.sh\n' >&2

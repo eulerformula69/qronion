@@ -15,7 +15,13 @@ from uuid import uuid4
 
 import update_from_git as git
 
-APP_DIR = Path('/home/queue/queue_project')
+def installation_path(preferred=Path('/home/qronion'), legacy=Path('/home/queue/queue_project')):
+    if not (preferred / 'main.env').is_file() and (legacy / 'main.env').is_file():
+        return legacy
+    return preferred
+
+
+APP_DIR = installation_path()
 REPO = 'https://github.com/eulerformula69/electronicqueue.git'
 STATE_ROOT = Path('/var/lib/queue-update')
 
@@ -83,12 +89,18 @@ def app_run(backend, project, *args):
     backend.run('runuser', '-u', 'queue', '--', project / 'venv/bin/python', *args, cwd=project)
 
 
+def environment_root(project):
+    if project == Path('/home/qronion'):
+        return project / '.environments'
+    return project.parent / 'queue-environments'
+
+
 def discard_old_environment(project):
     old = project / '.venv-before-update'
     if old.is_symlink():
         previous = old.resolve()
         old.unlink()
-        if previous.parent == (project.parent / 'queue-environments').resolve() and previous != (project / 'venv').resolve():
+        if previous.parent == (environment_root(project)).resolve() and previous != (project / 'venv').resolve():
             shutil.rmtree(previous)
     elif old.exists():
         shutil.rmtree(old)
@@ -114,7 +126,7 @@ def execute(source, project, state_file, backend, check=False):
     transaction.mkdir(mode=0o750)
     backend.run('chown', 'root:queue', transaction)
     # A venv must stay at its original path because entry points contain absolute paths.
-    environment = project.parent / 'queue-environments' / transaction.name
+    environment = environment_root(project) / transaction.name
     print('[1/5] Готовлю зависимости. Очередь продолжает работать.', flush=True)
     try:
         backend.run('install', '-d', '-o', 'queue', '-g', 'queue', environment)
@@ -207,7 +219,7 @@ def recover(project, state_file, backend):
         raise
     discard_old_environment(project)
     unused = Path(state['environment']).resolve()
-    if unused.parent == (project.parent / 'queue-environments').resolve() and unused != (project / 'venv').resolve():
+    if unused.parent == (environment_root(project)).resolve() and unused != (project / 'venv').resolve():
         shutil.rmtree(unused, ignore_errors=True)
     state_file.unlink()
     print('Очередь восстановлена и отвечает на запросы.')

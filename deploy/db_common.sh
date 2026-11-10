@@ -2,8 +2,12 @@
 # Общие функции для backup_db.sh и restore_db.sh
 
 APP_NAME="${APP_NAME:-queue}"
-APP_HOME="${APP_HOME:-/home/${APP_NAME}}"
-APP_DIR="${APP_DIR:-${APP_HOME}/queue_project}"
+source "$(dirname -- "${BASH_SOURCE[0]}")/install_path.sh"
+if [[ -n "${APP_HOME:-}" ]]; then
+    APP_DIR="${APP_DIR:-${APP_HOME}/queue_project}"
+else
+    APP_DIR="${APP_DIR:-$(qronion_install_path)}"
+fi
 APP_USER="${APP_USER:-queue}"
 SERVICE_NAME="${SERVICE_NAME:-queue.service}"
 ENV_FILE="${ENV_FILE:-${APP_DIR}/main.env}"
