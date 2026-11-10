@@ -9,11 +9,11 @@ def read_text(path: str) -> str:
 
 
 def test_operator_uses_shared_feedback_instead_of_browser_dialogs():
-    html = read_text("queue/operator.html")
-    source = read_text("queue/js/operator.js")
-    feedback = read_text("queue/js/operator-feedback.js")
+    html = read_text("web/operator.html")
+    source = read_text("web/js/operator.js")
+    feedback = read_text("web/js/operator-feedback.js")
 
-    assert '<script src="/queue/js/operator-feedback.js"></script>' in html
+    assert '<script src="/js/operator-feedback.js"></script>' in html
     assert "OperatorFeedback.toast" in source
     assert "OperatorFeedback.confirm" in source
     assert "OperatorFeedback.input" in source
@@ -25,7 +25,7 @@ def test_operator_uses_shared_feedback_instead_of_browser_dialogs():
 
 
 def test_operator_defer_replaces_return_to_queue_in_primary_actions():
-    source = read_text("queue/operator.html")
+    source = read_text("web/operator.html")
 
     primary_actions = source.split('<div class="button-group primary-actions">', 1)[1]
     primary_actions = primary_actions.split('<div class="button-group secondary-actions', 1)[0]
@@ -48,11 +48,11 @@ def test_operator_defer_replaces_return_to_queue_in_primary_actions():
 
 
 def test_call_by_number_button_is_opt_in_and_rendered_only_for_waiting_tickets():
-    html = read_text("queue/operator.html")
-    source = read_text("queue/js/operator-call-by-number.js")
-    sections = read_text("queue/js/operator-queue-sections.js")
+    html = read_text("web/operator.html")
+    source = read_text("web/js/operator-call-by-number.js")
+    sections = read_text("web/js/operator-queue-sections.js")
 
-    assert '<script src="/queue/js/operator-call-by-number.js"></script>' in html
+    assert '<script src="/js/operator-call-by-number.js"></script>' in html
     assert 'localStorage.getItem(SHOW_CALL_BY_NUMBER_STORAGE_KEY) === "true"' in source
     assert "toggleCallByNumberButtons(this.checked)" in html
     assert 'selectedSection === "waiting"' in sections
@@ -63,7 +63,7 @@ def test_call_by_number_button_is_opt_in_and_rendered_only_for_waiting_tickets()
 
 
 def test_operator_has_four_clickable_queue_columns():
-    source = read_text("queue/operator.html")
+    source = read_text("web/operator.html")
 
     assert 'data-section="waiting"' in source
     assert 'data-section="deferred"' in source
@@ -76,14 +76,14 @@ def test_operator_has_four_clickable_queue_columns():
 
 
 def test_operator_return_to_queue_is_not_primary_but_legacy_function_stays():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
 
     assert "returnCurrentToQueue" in source
     assert "confirmReturnCurrentToQueue" in source
 
 
 def test_redirect_limit_is_checked_before_modal_opens():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
     show_modal = source.split("async function showRedirectModal()", 1)[1].split(
         "function renderRedirectModal()", 1
     )[0]
@@ -98,7 +98,7 @@ def test_redirect_limit_is_checked_before_modal_opens():
 
 
 def test_operator_finish_warning_can_continue_or_confirm_finish():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
 
     assert "operatorSettings.short_service_warning_minutes" in source
     assert "warningMinutes * 60 * 1000" in source
@@ -111,14 +111,14 @@ def test_operator_finish_warning_can_continue_or_confirm_finish():
 
 
 def test_operator_actions_keep_existing_ticket_endpoints():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
 
     assert "/tickets/finish" in source
     assert "/tickets/cancel" in source
     assert "/tickets/defer" in source
     assert "/tickets/${sourceSection}/${ticketId}/resume" in source
     assert 'selectedSection === "deferred" || selectedSection === "cancelled"' in Path(
-        "queue/js/operator-queue-sections.js"
+        "web/js/operator-queue-sections.js"
     ).read_text(encoding="utf-8")
     assert "/tickets/return-to-queue" in source
     assert "/tickets/recall" in source
@@ -127,7 +127,7 @@ def test_operator_actions_keep_existing_ticket_endpoints():
 
 
 def test_cancel_and_defer_keep_waiting_section_selected():
-    source = Path("queue/js/operator.js").read_text(encoding="utf-8")
+    source = Path("web/js/operator.js").read_text(encoding="utf-8")
 
     cancel_action = source.split("async function cancelCurrent", 1)[1].split(
         "function showCancelReasonPopup", 1
@@ -142,7 +142,7 @@ def test_cancel_and_defer_keep_waiting_section_selected():
 
 
 def test_idle_ticket_text_is_smaller_without_shifting_client_label():
-    styles = Path("queue/css/operator.css").read_text(encoding="utf-8")
+    styles = Path("web/css/operator.css").read_text(encoding="utf-8")
 
     ticket_number = styles.split("body.operator-page .ticket-number{", 1)[1].split("}", 1)[0]
     idle_ticket_number = styles.split(
@@ -156,8 +156,8 @@ def test_idle_ticket_text_is_smaller_without_shifting_client_label():
 
 
 def test_operator_auto_call_uses_global_settings_without_local_toggle():
-    html = read_text("queue/operator.html")
-    source = read_text("queue/js/operator.js")
+    html = read_text("web/operator.html")
+    source = read_text("web/js/operator.js")
     display_zone = html.split('<section class="glass-card display-zone"', 1)[1]
     display_zone = display_zone.split('<section class="glass-card">', 1)[0]
     assert 'id="auto-call-toggle"' not in html
@@ -180,7 +180,7 @@ def test_operator_auto_call_uses_global_settings_without_local_toggle():
 
 
 def test_operator_auto_call_schedules_after_workspace_freeing_actions():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
 
     assert "function scheduleAutoCallAfterWorkspaceFreed()" in source
     assert source.count("scheduleAutoCallAfterWorkspaceFreed();") >= 5
@@ -197,7 +197,7 @@ def test_operator_auto_call_schedules_after_workspace_freeing_actions():
 
 
 def test_operator_auto_call_resumes_when_operator_goes_online():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
     change_status_section = source.split("async function changeWindowStatus", 1)[1]
     change_status_section = change_status_section.split("function updateStatusButtons", 1)[0]
 
@@ -207,9 +207,9 @@ def test_operator_auto_call_resumes_when_operator_goes_online():
 
 
 def test_operator_uses_one_direct_status_toggle():
-    html = read_text("queue/operator.html")
-    source = read_text("queue/js/operator.js")
-    ui_state = read_text("queue/js/operator-ui-state.js")
+    html = read_text("web/operator.html")
+    source = read_text("web/js/operator.js")
+    ui_state = read_text("web/js/operator-ui-state.js")
 
     assert 'id="window-status-toggle"' in html
     assert 'type="checkbox"' in html
@@ -226,7 +226,7 @@ def test_operator_uses_one_direct_status_toggle():
 
 
 def test_operator_auto_call_starts_when_admin_enables_it_for_free_workspace():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
     settings_section = source.split("async function loadOperatorReasonSettings", 1)[1]
     settings_section = settings_section.split("function withOtherComment", 1)[0]
 
@@ -241,7 +241,7 @@ def test_operator_auto_call_starts_when_admin_enables_it_for_free_workspace():
 
 
 def test_operator_auto_call_status_tracks_empty_queue_and_server_resumes_dispatch():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
     websocket_section = source.split("function initWebSocket", 1)[1]
     websocket_section = websocket_section.split("function startOperatorPolling", 1)[0]
     refresh_section = source.split("async function refreshQueueAndAutoCall", 1)[1]
@@ -264,7 +264,7 @@ def test_operator_auto_call_status_tracks_empty_queue_and_server_resumes_dispatc
     assert "Автовызов остановлен: достигнут лимит отложенных талонов" in render_section
     assert "Верните или отмените один из них" in render_section
 
-    styles = read_text("queue/css/operator.css")
+    styles = read_text("web/css/operator.css")
     status_styles = styles.split(
         "body.operator-page .auto-call-info-block .auto-call-status-text{", 1
     )[1].split("}", 1)[0]
@@ -272,15 +272,15 @@ def test_operator_auto_call_status_tracks_empty_queue_and_server_resumes_dispatc
 
 
 def test_operator_redirect_loads_services_hidden_on_terminal():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
 
     assert "`${CONFIG.API_URL}/services/?include_hidden=true`" in source
 
 
 def test_operator_redirect_uses_single_modal_button():
-    html = read_text("queue/operator.html")
-    js = read_text("queue/js/operator.js")
-    css = read_text("queue/css/operator.css")
+    html = read_text("web/operator.html")
+    js = read_text("web/js/operator.js")
+    css = read_text("web/css/operator.css")
 
     assert 'id="redirect-btn"' in html
     assert 'onclick="showRedirectModal()"' in html
@@ -325,7 +325,7 @@ def test_operator_redirect_uses_single_modal_button():
 
 
 def test_operator_redirect_by_service_does_not_require_window():
-    js = read_text("queue/js/operator.js")
+    js = read_text("web/js/operator.js")
 
     assert "if (!redirectState.windowId) return true;" in js
     assert "const endpoint = redirectState.windowId" in js
@@ -336,7 +336,7 @@ def test_operator_redirect_by_service_does_not_require_window():
 
 
 def test_operator_redirect_to_window_requires_compatible_service():
-    js = read_text("queue/js/operator.js")
+    js = read_text("web/js/operator.js")
 
     assert "const windowItem = getRedirectWindow(redirectState.windowId);" in js
     assert "return Boolean(windowItem && redirectWindowSupportsService(windowItem, redirectState.serviceId));" in js
@@ -346,7 +346,7 @@ def test_operator_redirect_to_window_requires_compatible_service():
 
 
 def test_operator_redirect_services_filter_by_selected_available_window():
-    js = read_text("queue/js/operator.js")
+    js = read_text("web/js/operator.js")
 
     assert "const selectedWindow = getRedirectWindow(redirectState.windowId);" in js
     assert "isRedirectWindowAvailable(selectedWindow)" in js
@@ -359,7 +359,7 @@ def test_operator_redirect_services_filter_by_selected_available_window():
 
 
 def test_operator_redirect_recipient_search_replaces_mode_buttons():
-    js = read_text("queue/js/operator.js")
+    js = read_text("web/js/operator.js")
 
     assert 'input.placeholder = DEFAULT_REDIRECT_RECIPIENT_LABEL;' in js
     assert "redirectState.windowQuery || DEFAULT_REDIRECT_RECIPIENT_LABEL" in js
@@ -370,8 +370,8 @@ def test_operator_redirect_recipient_search_replaces_mode_buttons():
 
 
 def test_operator_defer_requires_reason_options():
-    source = read_text("queue/js/operator.js")
-    queue_sections_source = read_text("queue/js/operator-queue-sections.js")
+    source = read_text("web/js/operator.js")
+    queue_sections_source = read_text("web/js/operator-queue-sections.js")
 
     assert "OperatorQueueSections.deferReasons" in source
     assert "loadOperatorReasonSettings" in source
@@ -386,8 +386,8 @@ def test_operator_defer_requires_reason_options():
 
 
 def test_operator_cancel_requires_reason_options():
-    source = read_text("queue/js/operator.js")
-    queue_sections_source = read_text("queue/js/operator-queue-sections.js")
+    source = read_text("web/js/operator.js")
+    queue_sections_source = read_text("web/js/operator-queue-sections.js")
 
     assert "showCancelReasonPopup()" in source
     assert "OperatorQueueSections.cancelReasons" in source
@@ -401,12 +401,12 @@ def test_operator_cancel_requires_reason_options():
 
 
 def test_operator_ui_uses_one_state_refresh_for_action_availability():
-    html = read_text("queue/operator.html")
-    source = read_text("queue/js/operator-ui-state.js")
-    css = read_text("queue/css/operator.css")
+    html = read_text("web/operator.html")
+    source = read_text("web/js/operator-ui-state.js")
+    css = read_text("web/css/operator.css")
 
     assert "function refreshOperatorUiState()" in source
-    assert '<script src="/queue/js/operator-ui-state.js"></script>' in html
+    assert '<script src="/js/operator-ui-state.js"></script>' in html
     assert 'document.querySelectorAll("[data-call-action]")' in source
     assert 'document.querySelectorAll("[data-current-ticket-action]")' in source
     assert "button.disabled = !online || hasTicket || busy" in source
@@ -419,8 +419,8 @@ def test_operator_ui_uses_one_state_refresh_for_action_availability():
 
 
 def test_operator_ui_follows_contextual_action_audit():
-    html = read_text("queue/operator.html")
-    css = read_text("queue/css/operator.css")
+    html = read_text("web/operator.html")
+    css = read_text("web/css/operator.css")
 
     assert '<meta name="viewport" content="width=device-width, initial-scale=1">' in html
     assert ">Вызвать следующего<" in html
@@ -443,14 +443,14 @@ def test_operator_ui_follows_contextual_action_audit():
 
 
 def test_called_ticket_redirect_button_is_enabled():
-    ui_state = read_text("queue/js/operator-ui-state.js")
+    ui_state = read_text("web/js/operator-ui-state.js")
 
     assert '"redirect-btn": isCalled || isServing' in ui_state
 
 
 def test_break_allows_finishing_active_ticket_but_not_starting_another():
-    ui_state = read_text("queue/js/operator-ui-state.js")
-    source = read_text("queue/js/operator.js")
+    ui_state = read_text("web/js/operator-ui-state.js")
+    source = read_text("web/js/operator.js")
     backend = read_text("app/routers/tickets.py")
 
     assert "button.disabled = !online || hasTicket || busy" in ui_state
@@ -461,7 +461,7 @@ def test_break_allows_finishing_active_ticket_but_not_starting_another():
 
 
 def test_break_with_active_ticket_offers_deferred_or_immediate_break():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
 
     assert "showBreakWithActiveTicketPopup()" in source
     assert "Уйти после завершения обслуживания" in source
@@ -472,10 +472,10 @@ def test_break_with_active_ticket_offers_deferred_or_immediate_break():
 
 
 def test_deferred_ticket_limit_and_reminder_are_configurable():
-    html = read_text("queue/operator.html")
-    source = read_text("queue/js/operator.js")
+    html = read_text("web/operator.html")
+    source = read_text("web/js/operator.js")
     backend = read_text("app/routers/tickets.py")
-    settings_view = read_text("queue/js/admin/views/settings.view.js")
+    settings_view = read_text("web/js/admin/views/settings.view.js")
 
     assert 'id="deferred-reminder"' in html
     assert "У вас всё ещё есть отложенные талоны" in source
@@ -485,7 +485,7 @@ def test_deferred_ticket_limit_and_reminder_are_configurable():
 
 
 def test_deferred_tickets_block_new_calls_with_an_explanation():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
     backend = read_text("app/routers/tickets.py")
     dispatcher = read_text("app/services/auto_dispatch.py")
 
@@ -497,7 +497,7 @@ def test_deferred_tickets_block_new_calls_with_an_explanation():
 
 
 def test_deferred_reminder_waits_two_minutes():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
 
     assert "function scheduleDeferredReminder(count, deferredSince)" in source
     assert "+ 2 * 60 * 1000" in source
@@ -505,7 +505,7 @@ def test_deferred_reminder_waits_two_minutes():
 
 
 def test_pending_break_runs_after_ticket_request_finishes():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
     scheduler = source.split("function scheduleAutoCallAfterWorkspaceFreed()", 1)[1]
     scheduler = scheduler.split("async function promptCallByNumber", 1)[0]
 
@@ -515,7 +515,7 @@ def test_pending_break_runs_after_ticket_request_finishes():
 
 
 def test_operator_queue_scrolls_inside_desktop_viewport():
-    css = read_text("queue/css/operator.css")
+    css = read_text("web/css/operator.css")
 
     body = css.split("body.operator-page{", 1)[1].split("}", 1)[0]
     layout = css.split("body.operator-page .main-layout{", 1)[1].split("}", 1)[0]
@@ -529,9 +529,9 @@ def test_operator_queue_scrolls_inside_desktop_viewport():
 
 
 def test_operator_mutations_share_double_click_guard():
-    source = read_text("queue/js/operator.js")
-    source += read_text("queue/js/operator-call-by-number.js")
-    ui_state = read_text("queue/js/operator-ui-state.js")
+    source = read_text("web/js/operator.js")
+    source += read_text("web/js/operator-call-by-number.js")
+    ui_state = read_text("web/js/operator-ui-state.js")
 
     assert "const activeOperatorRequests = new Set();" in ui_state
     assert "function beginOperatorRequest(key)" in ui_state
@@ -545,10 +545,10 @@ def test_operator_mutations_share_double_click_guard():
 
 
 def test_deferred_ticket_can_be_cancelled_from_queue_card():
-    source = read_text("queue/js/operator.js")
-    sections = read_text("queue/js/operator-queue-sections.js")
+    source = read_text("web/js/operator.js")
+    sections = read_text("web/js/operator-queue-sections.js")
     backend = read_text("app/routers/tickets.py")
-    css = read_text("queue/css/operator.css")
+    css = read_text("web/css/operator.css")
 
     assert "selectedSection === \"deferred\"" in sections
     assert "cancelDeferredTicket" in sections
@@ -564,8 +564,8 @@ def test_deferred_ticket_can_be_cancelled_from_queue_card():
 
 
 def test_operator_page_keeps_simple_auto_call_status_without_prompt_two_controls():
-    html = read_text("queue/operator.html")
-    source = read_text("queue/js/operator.js")
+    html = read_text("web/operator.html")
+    source = read_text("web/js/operator.js")
 
     assert "auto-call-info-block" in html
     assert "auto-call-status" in html
@@ -577,7 +577,7 @@ def test_operator_page_keeps_simple_auto_call_status_without_prompt_two_controls
 
 
 def test_auto_call_uses_distinct_break_and_offline_reasons():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
 
     assert 'return isOperatorOnBreak() ? "Перерыв" : "Оператор офлайн";' in source
     assert "Рабочее место занято текущим талоном" in source

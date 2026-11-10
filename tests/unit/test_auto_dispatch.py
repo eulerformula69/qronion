@@ -267,7 +267,7 @@ async def test_dispatcher_can_continue_below_deferred_limit(monkeypatch):
 
 
 def test_browser_does_not_own_server_managed_auto_call_timer():
-    source = open("queue/js/operator.js", encoding="utf-8").read()
+    source = open("web/js/operator.js", encoding="utf-8").read()
 
     assert "auto_call_server_managed" in source
     assert "autoDispatchCountdownTimer" in source
@@ -276,7 +276,7 @@ def test_browser_does_not_own_server_managed_auto_call_timer():
 
 
 def test_operator_refreshes_current_ticket_immediately_after_server_call():
-    source = open("queue/js/operator.js", encoding="utf-8").read()
+    source = open("web/js/operator.js", encoding="utf-8").read()
     websocket = source.split("operatorSocket.onmessage", 1)[1]
     websocket = websocket.split("operatorSocket.onclose", 1)[0]
 
@@ -289,7 +289,7 @@ def test_operator_refreshes_current_ticket_immediately_after_server_call():
 
 
 def test_operator_sees_notice_after_server_calls_client():
-    source = open("queue/js/operator.js", encoding="utf-8").read()
+    source = open("web/js/operator.js", encoding="utf-8").read()
     websocket = source.split("operatorSocket.onmessage", 1)[1]
     websocket = websocket.split("operatorSocket.onclose", 1)[0]
 
@@ -298,8 +298,8 @@ def test_operator_sees_notice_after_server_calls_client():
 
 
 def test_admin_labels_delay_as_server_call_countdown():
-    modern = open("queue/js/admin/views/settings.view.js", encoding="utf-8").read()
-    legacy = open("queue/js/admin/operators.js", encoding="utf-8").read()
+    modern = open("web/js/admin/views/settings.view.js", encoding="utf-8").read()
+    legacy = open("web/js/admin/operators.js", encoding="utf-8").read()
 
     assert "До автоматического вызова, секунд" in modern
     assert "До системного вызова, сек." in legacy

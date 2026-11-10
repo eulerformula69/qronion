@@ -34,8 +34,8 @@ function setup(engine) {
         speakTicket: () => speechCount++, speakTicketLite: () => speechCount++
     });
     context.window = context;
-    vm.runInContext(fs.readFileSync('queue/js/board-recovery.js', 'utf8'), context);
-    vm.runInContext(fs.readFileSync('queue/js/' + engine, 'utf8'), context);
+    vm.runInContext(fs.readFileSync('web/js/board-recovery.js', 'utf8'), context);
+    vm.runInContext(fs.readFileSync('web/js/' + engine, 'utf8'), context);
     if (engine === 'board.js') {
         // Observe the render input without depending on card markup.
         vm.runInContext('renderLatestTickets = function () { window.visibleCalled = latestTickets; window.visibleWaiting = latestWaitingTickets; }; connectWS();', context);

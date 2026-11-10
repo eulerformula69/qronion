@@ -24,7 +24,7 @@ function handleExpiredSession(message, options = {}) {
 
     sessionStorage.clear();
     if (options.silent) {
-        window.location.href = "/queue/login.html";
+        window.location.href = "/login.html";
         return;
     }
     OperatorFeedback.acknowledge({
@@ -32,7 +32,7 @@ function handleExpiredSession(message, options = {}) {
         message: alertMessage,
         buttonText: "Войти снова"
     }).then(() => {
-        window.location.href = "/queue/login.html";
+        window.location.href = "/login.html";
     });
 }
 
@@ -87,7 +87,7 @@ const PENDING_BREAK_STORAGE_KEY = "operatorPendingBreak";
 async function init() {
     const sessionToken = sessionStorage.getItem("session_id");
     if (!sessionToken) {
-        window.location.href = "/queue/login.html";
+        window.location.href = "/login.html";
         return;
     }
 
@@ -101,7 +101,7 @@ async function init() {
             return;
         }
         if (!res.ok) {
-            window.location.href = "/queue/login.html";
+            window.location.href = "/login.html";
             return;
         }
 
@@ -111,7 +111,7 @@ async function init() {
 
     } catch (e) {
         console.error(e);
-        window.location.href = "/queue/login.html";
+        window.location.href = "/login.html";
     }
 	
 	loadCurrentTicket();
@@ -1582,7 +1582,7 @@ async function changeWindowStatus(newStatus) {
         const sessionId = sessionStorage.getItem("session_id");
         if (!sessionId) {
             showToast("Сессия не найдена. Перезайдите.", "danger");
-            window.location.href = "/queue/login.html";
+            window.location.href = "/login.html";
             return false;
         }
 
@@ -1780,7 +1780,7 @@ async function logout() {
         console.error(e);
     } finally {
         sessionStorage.removeItem("session_id");
-        window.location.href = "/queue/login.html";
+        window.location.href = "/login.html";
     }
 }
 

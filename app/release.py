@@ -19,7 +19,7 @@ def _release_file_version() -> str | None:
 
 def _files_revision() -> str:
     hasher = hashlib.sha256()
-    for directory in (BASE_DIR / "app", BASE_DIR / "queue"):
+    for directory in (BASE_DIR / "app", BASE_DIR / "web"):
         if not directory.exists():
             continue
         for path in sorted(directory.rglob("*")):

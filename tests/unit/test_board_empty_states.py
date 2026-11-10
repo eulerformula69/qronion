@@ -10,8 +10,8 @@ def read_text(relative_path: str) -> str:
 
 def test_board_does_not_render_empty_state_cards():
     sources = [
-        read_text("queue/js/board.js"),
-        read_text("queue/js/board-lite.js"),
+        read_text("web/js/board.js"),
+        read_text("web/js/board-lite.js"),
     ]
 
     for source in sources:

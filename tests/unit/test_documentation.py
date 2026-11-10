@@ -65,8 +65,8 @@ def test_operator_and_admin_documents_are_isolated(docs_root):
 
 def test_frontend_exposes_editor_only_to_admin():
     root = Path(__file__).resolve().parents[2]
-    admin_source = (root / "queue/js/admin/views/docs.view.js").read_text(encoding="utf-8")
-    operator_source = (root / "queue/js/operator-docs.js").read_text(encoding="utf-8")
+    admin_source = (root / "web/js/admin/views/docs.view.js").read_text(encoding="utf-8")
+    operator_source = (root / "web/js/operator-docs.js").read_text(encoding="utf-8")
     assert 'method: "PUT"' in admin_source
     assert 'method: "PUT"' not in operator_source
     assert "openOperatorDocumentation" in operator_source
@@ -74,8 +74,8 @@ def test_frontend_exposes_editor_only_to_admin():
 
 def test_admin_uses_separate_read_and_edit_modes_without_split_preview():
     root = Path(__file__).resolve().parents[2]
-    source = (root / "queue/js/admin/views/docs.view.js").read_text(encoding="utf-8")
-    css = (root / "queue/css/admin/docs.css").read_text(encoding="utf-8")
+    source = (root / "web/js/admin/views/docs.view.js").read_text(encoding="utf-8")
+    css = (root / "web/css/admin/docs.css").read_text(encoding="utf-8")
     assert 'action: "doc-edit"' in source
     assert 'id="docs-content"' in source
     assert 'id="docs-editor"' in source

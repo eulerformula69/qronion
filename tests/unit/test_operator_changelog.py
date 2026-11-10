@@ -10,28 +10,28 @@ def read_text(path: str) -> str:
 
 
 def test_operator_page_loads_operator_changelog_only():
-    operator_html = read_text("queue/operator.html")
+    operator_html = read_text("web/operator.html")
 
-    assert '<script src="/queue/js/operator-changelog.js"></script>' in operator_html
-    assert '<script src="/queue/js/app-version.js"></script>' in operator_html
+    assert '<script src="/js/operator-changelog.js"></script>' in operator_html
+    assert '<script src="/js/app-version.js"></script>' in operator_html
     assert 'id="app-update-notification"' not in operator_html
     assert operator_html.index('app-version.js') < operator_html.index('operator-changelog.js')
     assert 'onclick="openOperatorChangelogHistory()"' in operator_html
     assert "Обновления" in operator_html
 
     other_pages = [
-        "queue/board.html",
-        "queue/terminal.html",
-        "queue/admin.html",
+        "web/board.html",
+        "web/terminal.html",
+        "web/admin.html",
     ]
     for page in other_pages:
         assert "operator-changelog.js" not in read_text(page)
 
 
 def test_operator_changelog_is_independent_from_system_version():
-    source = read_text("queue/js/operator-changelog.js")
+    source = read_text("web/js/operator-changelog.js")
 
-    assert 'CHANGELOG_URL = "/queue/changelog/operator.json"' in source
+    assert 'CHANGELOG_URL = "/changelog/operator.json"' in source
     assert 'STORAGE_KEY = "operatorChangelogVersion"' in source
     assert "CHECK_INTERVAL_MS = 60000" in source
     assert "ACTIVITY_CHECK_COOLDOWN_MS = 30000" in source
@@ -48,7 +48,7 @@ def test_operator_changelog_is_independent_from_system_version():
 
 
 def test_operator_changelog_polling_shows_update_banner_without_modal():
-    source = read_text("queue/js/operator-changelog.js")
+    source = read_text("web/js/operator-changelog.js")
 
     assert "pageChangelogVersion = version" in source
     assert "setInterval(() => loadOperatorChangelog({ checkForUpdate: true }), CHECK_INTERVAL_MS)" in source
@@ -67,7 +67,7 @@ def test_operator_changelog_polling_shows_update_banner_without_modal():
 
 
 def test_operator_changelog_click_check_uses_same_update_path_with_throttle():
-    source = read_text("queue/js/operator-changelog.js")
+    source = read_text("web/js/operator-changelog.js")
 
     assert "let lastActivityCheckAt = 0" in source
     assert "function checkOperatorChangelogOnActivity()" in source
@@ -90,7 +90,7 @@ def test_operator_changelog_click_check_uses_same_update_path_with_throttle():
 
 
 def test_operator_changelog_reload_shows_unread_popup_once():
-    source = read_text("queue/js/operator-changelog.js")
+    source = read_text("web/js/operator-changelog.js")
 
     initial_load = source.index("loadOperatorChangelog();")
     interval_load = source.index("setInterval(() => loadOperatorChangelog({ checkForUpdate: true }), CHECK_INTERVAL_MS)")
@@ -104,7 +104,7 @@ def test_operator_changelog_reload_shows_unread_popup_once():
 
 
 def test_operator_changelog_fails_silent_on_bad_or_missing_file():
-    source = read_text("queue/js/operator-changelog.js")
+    source = read_text("web/js/operator-changelog.js")
 
     assert "if (!response.ok) return;" in source
     assert "if (!isValidChangelog(data)) return;" in source
@@ -112,7 +112,7 @@ def test_operator_changelog_fails_silent_on_bad_or_missing_file():
 
 
 def test_operator_changelog_popup_is_centered_over_dimmed_operator_page():
-    source = read_text("queue/css/operator.css")
+    source = read_text("web/css/operator.css")
 
     assert "body.operator-page .operator-changelog-overlay" in source
     assert "background: rgba(0, 0, 0, 0.62);" in source
@@ -122,8 +122,8 @@ def test_operator_changelog_popup_is_centered_over_dimmed_operator_page():
 
 
 def test_operator_changelog_popup_can_show_previous_entries():
-    source = read_text("queue/js/operator-changelog.js")
-    css = read_text("queue/css/operator.css")
+    source = read_text("web/js/operator-changelog.js")
+    css = read_text("web/css/operator.css")
 
     assert "getPreviousEntries(data).forEach(entry => appendChangelogEntry(content, entry))" in source
     assert "operator-changelog-content" in source
@@ -132,9 +132,9 @@ def test_operator_changelog_popup_can_show_previous_entries():
 
 
 def test_operator_changelog_uses_playful_read_confirmation():
-    source = read_text("queue/js/operator-changelog.js")
-    settings_view = read_text("queue/js/admin/views/settings.view.js")
-    css = read_text("queue/css/operator.css")
+    source = read_text("web/js/operator-changelog.js")
+    settings_view = read_text("web/js/admin/views/settings.view.js")
+    css = read_text("web/css/operator.css")
 
     playful_text = "Нажимая эту кнопку, я подтверждаю, что прочитал(а) все обновления"
     assert playful_text in settings_view
@@ -148,7 +148,7 @@ def test_operator_changelog_uses_playful_read_confirmation():
 
 
 def test_operator_changelog_json_has_operator_facing_russian_text():
-    data = json.loads(read_text("queue/changelog/operator.json"))
+    data = json.loads(read_text("web/changelog/operator.json"))
 
     assert isinstance(data["version"], str)
     assert data["version"].strip()
@@ -165,7 +165,7 @@ def test_operator_changelog_json_has_operator_facing_russian_text():
 def test_operator_changelog_policy_exists():
     policy = read_text("docs/CHANGELOG_POLICY.md")
 
-    assert "`queue/changelog/operator.json` обновляется только" in policy
+    assert "`web/changelog/operator.json` обновляется только" in policy
     assert "Не обновлять operator changelog для изменений табло, терминала, админки, статистики" in policy
     assert "увеличить `version`" in policy
     assert "Писать только то, что важно оператору" in policy

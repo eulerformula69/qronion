@@ -1,7 +1,8 @@
 import asyncio
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -26,13 +27,38 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.mount("/queue", StaticFiles(directory=BASE_DIR / "queue"), name="queue")
-
 for router in (
     websocket.router, services.router, tickets.router, operators.router,
     windows.router, auth.router, admin.router, admin_tickets.router, scheduler.router, documentation.router, tts.router, system.router,
 ):
     app.include_router(router)
+
+
+@app.get("/", include_in_schema=False)
+async def site_home():
+    return RedirectResponse("/login.html")
+
+
+# Installed playlists and speech settings use these directories.
+for directory in ("media", "tts"):
+    app.mount(f"/queue/{directory}", StaticFiles(
+        directory=BASE_DIR / "queue" / directory, check_dir=False
+    ), name=directory)
+
+
+@app.get("/queue/{page}.html", include_in_schema=False)
+async def legacy_web_link(page: str, request: Request):
+    if page not in {"login", "operator", "admin", "terminal", "board"}:
+        raise HTTPException(status_code=404)
+    target = f"/{page}.html"
+    if request.url.query:
+        target += "?" + request.url.query
+    return RedirectResponse(target, status_code=308)
+
+
+web_files = StaticFiles(directory=BASE_DIR / "web")
+app.mount("/queue", web_files, name="legacy_web")
+app.mount("/", web_files, name="web")
 
 
 @app.on_event("startup")

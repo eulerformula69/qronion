@@ -47,8 +47,8 @@ def test_schedule_is_not_due_before_time_or_on_another_weekday():
 
 def test_close_day_includes_serving_tickets_and_admin_has_scheduler_view():
     close_day_source = (ROOT / "app/services/close_day.py").read_text(encoding="utf-8")
-    app_source = (ROOT / "queue/js/admin/app.js").read_text(encoding="utf-8")
-    view_source = (ROOT / "queue/js/admin/views/scheduler.view.js").read_text(encoding="utf-8")
+    app_source = (ROOT / "web/js/admin/app.js").read_text(encoding="utf-8")
+    view_source = (ROOT / "web/js/admin/views/scheduler.view.js").read_text(encoding="utf-8")
 
     assert '("waiting", "called", "serving")' in close_day_source
     assert 'label: "Планировщик"' in app_source

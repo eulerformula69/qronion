@@ -124,7 +124,7 @@ stateDiagram-v2
 - `app/services/tickets.py` — выбор, назначение и переходы талонов;
 - `app/routers/tickets.py` — HTTP endpoints;
 - `app/models.py` — модель талона;
-- `queue/js/operator.js` — клиентский таймер текущего автовызова;
+- `web/js/operator.js` — клиентский таймер текущего автовызова;
 - `data/statistics.json` — отчёты, использующие старую семантику `called_at`.
 
 ## Серверный диспетчер

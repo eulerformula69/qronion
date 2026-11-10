@@ -33,7 +33,7 @@ class Linux:
     def healthy(self):
         for _ in range(30):
             try:
-                with urllib.request.urlopen('http://127.0.0.1:8000/queue/login.html', timeout=2) as response:
+                with urllib.request.urlopen('http://127.0.0.1:8000/login.html', timeout=2) as response:
                     if response.status == 200:
                         return
             except OSError:

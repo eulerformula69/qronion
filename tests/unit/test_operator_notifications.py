@@ -38,7 +38,7 @@ def test_operator_details_returns_notification_state():
 
 
 def test_operator_service_checkboxes_are_rendered_and_saved():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
 
     assert "serviceNotificationSettings = new Map" in source
     assert "service-notification-checkbox" in source
@@ -48,7 +48,7 @@ def test_operator_service_checkboxes_are_rendered_and_saved():
 
 
 def test_new_ticket_notifications_are_filtered_by_service_setting():
-    source = read_text("queue/js/operator.js")
+    source = read_text("web/js/operator.js")
 
     assert "isServiceNotificationEnabled(t.service_id)" in source
     assert "ticketsForNotification" in source

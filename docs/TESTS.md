@@ -132,7 +132,7 @@ PostgreSQL, Docker и Node.js **не нужны**.
 
 ### 5. Unit-тесты фронтенда (низкий приоритет)
 
-Вынести чистые функции из `queue/js/board.js`, `queue/js/tts.js` в ES-модули и покрыть Vitest/Jest — без браузера.
+Вынести чистые функции из `web/js/board.js`, `web/js/tts.js` в ES-модули и покрыть Vitest/Jest — без браузера.
 
 ---
 

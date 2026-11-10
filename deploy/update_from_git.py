@@ -92,7 +92,7 @@ def is_excluded(relative_path: str, patterns: list[str]) -> bool:
             if any(fnmatch.fnmatch(prefix, folder_pattern) for prefix in folder_prefixes):
                 return True
 
-        # Обычный glob: *.db, queue/js/config.js, queue/tts/*
+        # Обычный glob: *.db, web/js/config.js, queue/tts/*
         if fnmatch.fnmatch(relative_path, pattern):
             return True
 

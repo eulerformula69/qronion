@@ -12,16 +12,16 @@ def _read(path: str) -> str:
 
 
 def test_board_html_loads_profiles_before_board_script():
-    source = _read("queue/board.html")
-    bootstrap = _read("queue/js/board-bootstrap.js")
+    source = _read("web/board.html")
+    bootstrap = _read("web/js/board-bootstrap.js")
 
-    assert '<script src="/queue/js/board-bootstrap.js?v=board-profile-8"></script>' in source
-    assert 'loadScript("/queue/js/board-profiles.js")' in bootstrap
-    assert bootstrap.index('/queue/js/board-profiles.js') < bootstrap.index('/queue/js/board.js')
+    assert '<script src="/js/board-bootstrap.js?v=board-profile-8"></script>' in source
+    assert 'loadScript("/js/board-profiles.js")' in bootstrap
+    assert bootstrap.index('/js/board-profiles.js') < bootstrap.index('/js/board.js')
 
 
 def test_board_profiles_normalize_screen_values_and_enable_popup_only_for_screen_2():
-    source = _read("queue/js/board-profiles.js")
+    source = _read("web/js/board-profiles.js")
 
     assert "const BOARD_PROFILES" in source
     assert "callPopup: false" in source
@@ -35,9 +35,9 @@ def test_board_profiles_normalize_screen_values_and_enable_popup_only_for_screen
 
 
 def test_media_screen_uses_standard_board_with_media_profile():
-    page = _read("queue/board.html")
-    profiles = _read("queue/js/board-profiles.js")
-    bootstrap = _read("queue/js/board-bootstrap.js")
+    page = _read("web/board.html")
+    profiles = _read("web/js/board-profiles.js")
+    bootstrap = _read("web/js/board-bootstrap.js")
 
     assert '<video id="media-video" autoplay playsinline></video>' in page
     assert 'media: {' in profiles
@@ -50,15 +50,15 @@ def test_media_screen_uses_standard_board_with_media_profile():
     assert 'showLabels: false' in bootstrap
     assert 'callAudioEnabled: getBooleanFlag("call_audio", true)' in bootstrap
     assert 'videoAudioEnabled: getBooleanFlag("video_audio", true)' in bootstrap
-    assert 'loadScript("/queue/js/media-lite.js?v=board-profile-7")' in bootstrap
-    assert 'loadScript("/queue/js/tts-lite.js?v=board-profile-7")' in bootstrap
-    assert 'loadScript("/queue/js/board-lite.js?v=board-recovery-1")' in bootstrap
-    assert 'loadScript("/queue/js/board.js?v=board-recovery-1")' in bootstrap
+    assert 'loadScript("/js/media-lite.js?v=board-profile-7")' in bootstrap
+    assert 'loadScript("/js/tts-lite.js?v=board-profile-7")' in bootstrap
+    assert 'loadScript("/js/board-lite.js?v=board-recovery-1")' in bootstrap
+    assert 'loadScript("/js/board.js?v=board-recovery-1")' in bootstrap
 
 
 def test_media_profile_hides_ticket_and_operator_labels_in_cards():
-    board = _read("queue/js/board.js")
-    lite_board = _read("queue/js/board-lite.js")
+    board = _read("web/js/board.js")
+    lite_board = _read("web/js/board-lite.js")
 
     assert "!window.BoardProfiles.shouldShowLabels()" in board
     assert "left: number" in board
@@ -69,9 +69,9 @@ def test_media_profile_hides_ticket_and_operator_labels_in_cards():
 
 
 def test_media_audio_flags_control_ticket_announcements_and_video_sound():
-    bootstrap = _read("queue/js/board-bootstrap.js")
-    lite_board = _read("queue/js/board-lite.js")
-    media = _read("queue/js/media-lite.js")
+    bootstrap = _read("web/js/board-bootstrap.js")
+    lite_board = _read("web/js/board-lite.js")
+    media = _read("web/js/media-lite.js")
 
     assert 'getBooleanFlag("call_audio", true)' in bootstrap
     assert 'getBooleanFlag("video_audio", true)' in bootstrap
@@ -84,7 +84,7 @@ def test_media_audio_flags_control_ticket_announcements_and_video_sound():
 
 
 def test_media_tts_uses_web_audio_without_stealing_the_video_element():
-    source = _read("queue/js/tts-lite.js")
+    source = _read("web/js/tts-lite.js")
 
     assert "window.AudioContext || window.webkitAudioContext" in source
     assert 'request.responseType = "arraybuffer"' in source
@@ -94,7 +94,7 @@ def test_media_tts_uses_web_audio_without_stealing_the_video_element():
 
 
 def test_media_board_speaks_only_explicit_call_events_with_server_tts_text():
-    source = _read("queue/js/board-lite.js")
+    source = _read("web/js/board-lite.js")
 
     handle_state_start = source.index("function handleBoardState(boardState)")
     handle_recall_start = source.index("function handleRecall(data)")
@@ -108,7 +108,7 @@ def test_media_board_speaks_only_explicit_call_events_with_server_tts_text():
 
 
 def test_board_popup_is_triggered_only_by_deduplicated_ticket_called_events_and_can_replace_highlight():
-    source = _read("queue/js/board.js")
+    source = _read("web/js/board.js")
 
     ticket_called_index = source.index('if (data.type === "ticket_called")')
     duplicate_index = source.index("processedCallIds.has(data.call_id)", ticket_called_index)
@@ -121,7 +121,7 @@ def test_board_popup_is_triggered_only_by_deduplicated_ticket_called_events_and_
 
 
 def test_board_popup_uses_safe_dom_text_assignment_and_auto_hides():
-    source = _read("queue/js/board-profiles.js")
+    source = _read("web/js/board-profiles.js")
 
     assert "POPUP_DURATION_MS = 5500" in source
     assert ".textContent =" in source
@@ -131,8 +131,8 @@ def test_board_popup_uses_safe_dom_text_assignment_and_auto_hides():
 
 
 def test_board_popup_uses_single_orange_operator_window_line():
-    source = _read("queue/js/board-profiles.js")
-    board_css = _read("queue/css/board.css")
+    source = _read("web/js/board-profiles.js")
+    board_css = _read("web/css/board.css")
 
     assert 'getCallValue(data, "operator_name")' not in source
     assert 'windowName ? `Оператор ${windowName}` : ""' in source

@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const vm = require('node:vm');
 const fs = require('node:fs');
 const { webcrypto } = require('node:crypto');
-const source = fs.readFileSync('queue/js/terminal-ticket-request.js', 'utf8');
+const source = fs.readFileSync('web/js/terminal-ticket-request.js', 'utf8');
 
 function browser(storage, fetch) {
     const context = vm.createContext({

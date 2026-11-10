@@ -9,9 +9,9 @@ def _read(path: str) -> str:
 
 
 def test_workplaces_and_operators_share_one_operational_screen():
-    app_source = _read("queue/js/admin/app.js")
-    view_source = _read("queue/js/admin/views/windows.view.js")
-    css_source = _read("queue/css/admin/workplaces.css")
+    app_source = _read("web/js/admin/app.js")
+    view_source = _read("web/js/admin/views/windows.view.js")
+    css_source = _read("web/css/admin/workplaces.css")
 
     assert 'label: "Рабочие места и операторы"' in app_source
     assert 'import { mount as mountOperators }' not in app_source
@@ -37,8 +37,8 @@ def test_workplaces_and_operators_share_one_operational_screen():
 
 
 def test_admin_navigation_order_groups_and_long_label_layout():
-    app_source = _read("queue/js/admin/app.js")
-    shell_css = _read("queue/css/admin/shell.css")
+    app_source = _read("web/js/admin/app.js")
+    shell_css = _read("web/css/admin/shell.css")
 
     services_position = app_source.index("    services: {")
     windows_position = app_source.index("    windows: {")
@@ -56,7 +56,7 @@ def test_admin_navigation_order_groups_and_long_label_layout():
 
 
 def test_operator_admin_table_shows_visible_id_and_keeps_internal_id():
-    source = _read("queue/js/admin/views/operators.view.js")
+    source = _read("web/js/admin/views/operators.view.js")
 
     assert "<td>${operator.id}</td>" in source
     assert 'ctx.ui.sortHeader("ID", "id", sortState)' in source
@@ -66,7 +66,7 @@ def test_operator_admin_table_shows_visible_id_and_keeps_internal_id():
 
 
 def test_workplace_cards_show_ids_and_support_sorting():
-    source = _read("queue/js/admin/views/windows.view.js")
+    source = _read("web/js/admin/views/windows.view.js")
 
     assert 'class="workplace-meta">ID ${windowItem.id}</small>' in source
     assert 'data-window-id="${windowItem.id}"' in source
@@ -78,9 +78,9 @@ def test_workplace_cards_show_ids_and_support_sorting():
 
 
 def test_window_admin_loads_hidden_terminal_services_for_internal_assignment():
-    modern_source = _read("queue/js/admin/views/windows.view.js")
-    legacy_source = _read("queue/js/admin/windows.js")
-    map_source = _read("queue/js/admin/map.js")
+    modern_source = _read("web/js/admin/views/windows.view.js")
+    legacy_source = _read("web/js/admin/windows.js")
+    map_source = _read("web/js/admin/map.js")
 
     assert 'ctx.api.request("/services/?include_hidden=true")' in modern_source
     assert "fetchJSON(`${API}/services/?include_hidden=true`)" in legacy_source
@@ -88,7 +88,7 @@ def test_window_admin_loads_hidden_terminal_services_for_internal_assignment():
 
 
 def test_service_admin_list_hides_visible_id_but_keeps_data_id():
-    source = _read("queue/js/admin/views/services.view.js")
+    source = _read("web/js/admin/views/services.view.js")
 
     assert "admin-service-id" not in source
     assert 'data-service-id="${service.id}"' in source
@@ -96,7 +96,7 @@ def test_service_admin_list_hides_visible_id_but_keeps_data_id():
 
 
 def test_service_statuses_use_clear_russian_labels_with_terminal_context():
-    source = _read("queue/js/admin/views/services.view.js")
+    source = _read("web/js/admin/views/services.view.js")
 
     assert '"Предоставляется"' in source
     assert 'ctx.ui.switchField("status_active", service.status === "active")' in source
@@ -105,7 +105,7 @@ def test_service_statuses_use_clear_russian_labels_with_terminal_context():
 
 
 def test_services_use_separate_short_create_dialogs_without_availability_dashboard():
-    source = _read("queue/js/admin/views/services.view.js")
+    source = _read("web/js/admin/views/services.view.js")
 
     assert 'button("Добавить услугу", {variant: "primary", action: "create-service"})' in source
     assert 'button("Добавить группу", {variant: "secondary", action: "create-group"})' in source
@@ -119,7 +119,7 @@ def test_services_use_separate_short_create_dialogs_without_availability_dashboa
 
 
 def test_service_groups_support_drag_reordering_and_accessible_button_fallback():
-    source = _read("queue/js/admin/views/services.view.js")
+    source = _read("web/js/admin/views/services.view.js")
 
     assert 'class="admin-group-drag-handle" draggable="true"' in source
     assert "async function persistGroupOrder()" in source
@@ -131,8 +131,8 @@ def test_service_groups_support_drag_reordering_and_accessible_button_fallback()
 
 
 def test_service_group_drag_handle_is_centered_beside_name_and_count():
-    source = _read("queue/js/admin/views/services.view.js")
-    css = _read("queue/css/admin/services.css")
+    source = _read("web/js/admin/views/services.view.js")
+    css = _read("web/css/admin/services.css")
 
     assert 'class="admin-service-group-heading"' in source
     assert 'class="admin-service-group-copy"' in source
@@ -145,30 +145,30 @@ def test_service_group_drag_handle_is_centered_beside_name_and_count():
 
 
 def test_admin_views_use_click_sorting_with_direction_toggle():
-    source = _read("queue/js/admin/views/operators.view.js")
+    source = _read("web/js/admin/views/operators.view.js")
     assert 'button.dataset.action === "sort"' in source
     assert 'sortState.key === key && sortState.direction === "asc" ? "desc" : "asc"' in source
 
-    workplaces = _read("queue/js/admin/views/windows.view.js")
+    workplaces = _read("web/js/admin/views/windows.view.js")
     assert 'button.dataset.action === "sort"' in workplaces
     assert 'sortState.key === key && sortState.direction === "asc" ? "desc" : "asc"' in workplaces
 
 
 def test_admin_views_persist_sort_state():
-    source = _read("queue/js/admin/views/operators.view.js")
+    source = _read("web/js/admin/views/operators.view.js")
     assert 'const sortStorageKey = "admin.operators.sort"' in source
     assert "sortState = loadSortState(sortState)" in source
     assert "saveSortState(sortState)" in source
     assert "localStorage.setItem(sortStorageKey, JSON.stringify(state))" in source
 
-    workplaces = _read("queue/js/admin/views/windows.view.js")
+    workplaces = _read("web/js/admin/views/windows.view.js")
     assert 'const sortStorageKey = "admin.workplaces.sort"' in workplaces
     assert "sortState = loadSortState(sortState)" in workplaces
     assert "localStorage.setItem(sortStorageKey, JSON.stringify(sortState))" in workplaces
 
 
 def test_table_helper_renders_sortable_headers():
-    source = _read("queue/js/admin/ui.js")
+    source = _read("web/js/admin/ui.js")
 
     assert "export function sortHeader" in source
     assert "headers.map(renderTableHeader)" in source
@@ -177,8 +177,8 @@ def test_table_helper_renders_sortable_headers():
 
 
 def test_media_view_uses_compact_cards_and_opens_video_in_new_tab():
-    source = _read("queue/js/admin/views/media.view.js")
-    css = _read("queue/css/admin/media.css")
+    source = _read("web/js/admin/views/media.view.js")
+    css = _read("web/css/admin/media.css")
 
     assert 'class="admin-media-card admin-media-card-${status}${ready && !included ? " admin-media-card-inactive" : ""}"' in source
     assert 'target="_blank" rel="noopener"' in source
@@ -196,7 +196,7 @@ def test_media_view_uses_compact_cards_and_opens_video_in_new_tab():
 
 
 def test_media_navigation_is_part_of_system_group():
-    source = _read("queue/js/admin/app.js")
+    source = _read("web/js/admin/app.js")
     media_route = source[source.index("media: {"):source.index("map: {")]
 
     assert 'group: "Система"' in media_route
@@ -204,7 +204,7 @@ def test_media_navigation_is_part_of_system_group():
 
 
 def test_media_playlist_toggle_updates_only_its_card():
-    source = _read("queue/js/admin/views/media.view.js")
+    source = _read("web/js/admin/views/media.view.js")
     toggle_source = source[source.index("async function toggle(input)"):source.index("async function deleteFile")]
 
     assert "updatePlaylistCard(card, checked)" in toggle_source
@@ -214,15 +214,15 @@ def test_media_playlist_toggle_updates_only_its_card():
 
 
 def test_media_playlist_switch_comes_before_its_label():
-    source = _read("queue/js/admin/views/media.view.js")
+    source = _read("web/js/admin/views/media.view.js")
     switch_source = source[source.index("function renderPlaylistSwitch"):source.index("function renderEmptyState")]
 
     assert switch_source.index('type="checkbox"') < switch_source.index("<span>${included ?")
 
 
 def test_media_upload_uses_single_entry_button_and_dialog():
-    source = _read("queue/js/admin/views/media.view.js")
-    css = _read("queue/css/admin/media.css")
+    source = _read("web/js/admin/views/media.view.js")
+    css = _read("web/css/admin/media.css")
 
     assert 'button("Загрузить файл", {variant: "primary", action: "open-upload"})' in source
     assert '<h2 id="media-section-title">' not in source
@@ -238,7 +238,7 @@ def test_media_upload_uses_single_entry_button_and_dialog():
 
 
 def test_sorting_layout_has_stable_column_widths():
-    source = _read("queue/css/admin/shell.css") + _read("queue/css/admin/services.css")
+    source = _read("web/css/admin/shell.css") + _read("web/css/admin/services.css")
 
     assert "table-layout: fixed;" in source
     assert "flex: 0 0 12px;" in source
@@ -249,7 +249,7 @@ def test_sorting_layout_has_stable_column_widths():
 
 
 def test_settings_view_renders_and_saves_board_ticker_text():
-    source = _read("queue/js/admin/views/settings.view.js")
+    source = _read("web/js/admin/views/settings.view.js")
 
     assert "setting-board-ticker-text" in source
     assert "board_ticker_text" in source
@@ -261,8 +261,8 @@ def test_settings_view_renders_and_saves_board_ticker_text():
 
 
 def test_settings_view_renders_and_saves_ticket_reason_options():
-    modern_source = _read("queue/js/admin/views/settings.view.js")
-    legacy_source = _read("queue/js/admin/settings.js")
+    modern_source = _read("web/js/admin/views/settings.view.js")
+    legacy_source = _read("web/js/admin/settings.js")
 
     for source in (modern_source, legacy_source):
         assert "Причины отмены" in source
@@ -274,9 +274,9 @@ def test_settings_view_renders_and_saves_ticket_reason_options():
 
 
 def test_settings_view_renders_and_saves_ticket_print_scale_percent():
-    source = _read("queue/js/admin/views/settings.view.js")
-    terminal = _read("queue/js/terminal.js")
-    terminal_html = _read("queue/terminal.html")
+    source = _read("web/js/admin/views/settings.view.js")
+    terminal = _read("web/js/terminal.js")
+    terminal_html = _read("web/terminal.html")
 
     assert "ticket_print_scale_percent" in source
     assert "validTicketPrintScale" in source
@@ -286,9 +286,9 @@ def test_settings_view_renders_and_saves_ticket_print_scale_percent():
 
 
 def test_terminal_services_are_paginated_to_fit_the_viewport():
-    terminal = _read("queue/js/terminal.js")
-    terminal_html = _read("queue/terminal.html")
-    terminal_css = _read("queue/css/terminal.css")
+    terminal = _read("web/js/terminal.js")
+    terminal_html = _read("web/terminal.html")
+    terminal_css = _read("web/css/terminal.css")
 
     assert "buildServicePages" in terminal
     assert "container.scrollHeight <= container.clientHeight" in terminal
@@ -300,8 +300,8 @@ def test_terminal_services_are_paginated_to_fit_the_viewport():
 
 
 def test_settings_view_renders_and_saves_auto_call_settings():
-    modern_source = _read("queue/js/admin/views/settings.view.js")
-    legacy_source = _read("queue/js/admin/settings.js")
+    modern_source = _read("web/js/admin/views/settings.view.js")
+    legacy_source = _read("web/js/admin/settings.js")
 
     for source in (modern_source, legacy_source):
         assert "auto_call_enabled" in source
@@ -313,8 +313,8 @@ def test_settings_view_renders_and_saves_auto_call_settings():
 
 
 def test_global_auto_call_settings_are_in_rules_not_operators():
-    operators_source = _read("queue/js/admin/views/operators.view.js")
-    settings_source = _read("queue/js/admin/views/settings.view.js")
+    operators_source = _read("web/js/admin/views/operators.view.js")
+    settings_source = _read("web/js/admin/views/settings.view.js")
 
     assert "operator-auto-call-form" not in operators_source
     assert 'ctx.api.request("/admin/settings")' not in operators_source
@@ -324,8 +324,8 @@ def test_global_auto_call_settings_are_in_rules_not_operators():
 
 def test_settings_views_do_not_expose_legacy_queue_modes():
     for relative_path in (
-        "queue/js/admin/settings.js",
-        "queue/js/admin/views/settings.view.js",
+        "web/js/admin/settings.js",
+        "web/js/admin/views/settings.view.js",
     ):
         source = (ROOT / relative_path).read_text(encoding="utf-8")
         assert "queue_mode" not in source
@@ -333,7 +333,7 @@ def test_settings_views_do_not_expose_legacy_queue_modes():
         assert "Режим очереди" not in source
 
 def test_services_view_uses_drag_order_without_click_sorting():
-    source = _read("queue/js/admin/views/services.view.js")
+    source = _read("web/js/admin/views/services.view.js")
 
     assert "admin.services.sort" not in source
     assert 'data-action="sort"' not in source
@@ -343,14 +343,14 @@ def test_services_view_uses_drag_order_without_click_sorting():
 
 
 def test_settings_view_does_not_show_template_hint_caption():
-    source = _read("queue/js/admin/views/settings.view.js")
+    source = _read("web/js/admin/views/settings.view.js")
 
     assert "В шаблонах должны остаться параметры" not in source
 
 
 def test_admin_settings_are_split_into_system_routes():
-    app_source = _read("queue/js/admin/app.js")
-    settings_source = _read("queue/js/admin/views/settings.view.js")
+    app_source = _read("web/js/admin/app.js")
+    settings_source = _read("web/js/admin/views/settings.view.js")
 
     assert 'terminalSettings:' in app_source
     assert 'boardSettings:' in app_source
@@ -365,8 +365,8 @@ def test_admin_settings_are_split_into_system_routes():
 
 
 def test_admin_settings_do_not_repeat_page_heading_inside_card():
-    settings_source = _read("queue/js/admin/views/settings.view.js")
-    settings_css = _read("queue/css/admin/settings.css")
+    settings_source = _read("web/js/admin/views/settings.view.js")
+    settings_css = _read("web/css/admin/settings.css")
 
     assert '<h2>Терминал</h2>' not in settings_source
     assert '<h2>Оператор и очередь</h2>' not in settings_source
@@ -377,7 +377,7 @@ def test_admin_settings_do_not_repeat_page_heading_inside_card():
 
 
 def test_admin_settings_nested_rows_stay_compact_and_save_is_pinned():
-    settings_css = _read("queue/css/admin/settings.css")
+    settings_css = _read("web/css/admin/settings.css")
 
     assert ".admin-field:has(> .admin-switch)" in settings_css
     assert "[data-reason-option-row]" in settings_css
@@ -388,9 +388,9 @@ def test_admin_settings_nested_rows_stay_compact_and_save_is_pinned():
 
 
 def test_admin_shell_has_only_one_vertical_scroll_container():
-    html_source = _read("queue/admin.html")
-    shell_css = _read("queue/css/admin/shell.css")
-    responsive_css = _read("queue/css/admin/feedback-map-responsive.css")
+    html_source = _read("web/admin.html")
+    shell_css = _read("web/css/admin/shell.css")
+    responsive_css = _read("web/css/admin/feedback-map-responsive.css")
 
     assert '<html lang="ru" class="admin-document">' in html_source
     assert "html.admin-document" in shell_css
@@ -400,7 +400,7 @@ def test_admin_shell_has_only_one_vertical_scroll_container():
 
 
 def test_admin_notifications_are_centered_at_the_top():
-    responsive_css = _read("queue/css/admin/feedback-map-responsive.css")
+    responsive_css = _read("web/css/admin/feedback-map-responsive.css")
     toast_styles = responsive_css.split("body.admin-page .admin-toast-host", 1)[1].split("}", 1)[0]
 
     assert "top: 22px;" in toast_styles
@@ -411,8 +411,8 @@ def test_admin_notifications_are_centered_at_the_top():
 
 
 def test_admin_sidebar_is_unbranded_collapsible_and_keeps_desktop_preference():
-    app_source = _read("queue/js/admin/app.js")
-    shell_css = _read("queue/css/admin/shell.css")
+    app_source = _read("web/js/admin/app.js")
+    shell_css = _read("web/css/admin/shell.css")
 
     assert 'class="admin-brand"' not in app_source
     assert "Qronion" not in app_source
@@ -432,7 +432,7 @@ def test_admin_sidebar_is_unbranded_collapsible_and_keeps_desktop_preference():
 
 
 def test_admin_system_routes_follow_operational_order():
-    app_source = _read("queue/js/admin/app.js")
+    app_source = _read("web/js/admin/app.js")
 
     route_positions = [
         app_source.index("terminalSettings:"),
@@ -448,10 +448,10 @@ def test_admin_system_routes_follow_operational_order():
 
 
 def test_admin_statistics_embed_grafana_with_fallback_actions():
-    app_source = _read("queue/js/admin/app.js")
-    stats_source = _read("queue/js/admin/views/stats.view.js")
-    admin_css = _read("queue/css/admin.css")
-    stats_css = _read("queue/css/admin/stats.css")
+    app_source = _read("web/js/admin/app.js")
+    stats_source = _read("web/js/admin/views/stats.view.js")
+    admin_css = _read("web/css/admin.css")
+    stats_css = _read("web/css/admin/stats.css")
 
     stats_route = app_source.split("stats: {", 1)[1].split("}", 1)[0]
     assert "externalUrl" not in stats_route
@@ -469,7 +469,7 @@ def test_admin_statistics_embed_grafana_with_fallback_actions():
 
 
 def test_grafana_is_embedded_through_same_origin_https_proxy():
-    config_source = _read("queue/js/config.js")
+    config_source = _read("web/js/config.js")
     installer_source = _read("deploy/install.sh")
 
     assert "${window.location.origin}/grafana/d/queue-statistics/queue-statistics" in config_source
@@ -496,9 +496,9 @@ def test_focused_grafana_embed_migration_is_available():
 
 
 def test_board_status_moves_with_ticker_offset():
-    board_css = _read("queue/css/board.css")
-    media_css = _read("queue/css/board-media/main.css")
-    lite_css = _read("queue/css/board-media/lite.css")
+    board_css = _read("web/css/board.css")
+    media_css = _read("web/css/board-media/main.css")
+    lite_css = _read("web/css/board-media/lite.css")
 
     assert "--board-ticker-offset: 0px;" in board_css
     assert "bottom: calc(10px + var(--board-ticker-offset));" in board_css
@@ -509,7 +509,7 @@ def test_board_status_moves_with_ticker_offset():
 
 
 def test_lite_media_board_reserves_ticker_height():
-    lite_css = _read("queue/css/board-media/lite.css")
+    lite_css = _read("web/css/board-media/lite.css")
 
     assert 'grid-template-areas:\n        "header"\n        "main"\n        "ticker";' in lite_css
     assert "grid-template-rows: var(--lite-header-height) minmax(0, 1fr) var(--lite-ticker-height);" in lite_css
@@ -521,7 +521,7 @@ def test_lite_media_board_reserves_ticker_height():
 
 
 def test_global_credentials_move_with_ticker_offset():
-    source = _read("queue/css/base.css")
+    source = _read("web/css/base.css")
 
     assert "body::after" in source
     assert "bottom: calc(12px + var(--board-ticker-offset, 0px));" in source
@@ -529,9 +529,9 @@ def test_global_credentials_move_with_ticker_offset():
 
 
 def test_board_ticker_uses_seamless_repeated_segment():
-    script = _read("queue/js/board-ticker.js")
-    board_css = _read("queue/css/board.css")
-    media_css = _read("queue/css/board-media/main.css")
+    script = _read("web/js/board-ticker.js")
+    board_css = _read("web/css/board.css")
+    media_css = _read("web/css/board-media/main.css")
 
     assert "repeatCount = Math.max(2, Math.ceil(tickerWidth / setWidth) + 2)" in script
     assert "track.style.setProperty(\"--board-ticker-distance\"" in script
@@ -544,9 +544,9 @@ def test_board_ticker_uses_seamless_repeated_segment():
 
 
 def test_board_ticker_splits_multiline_messages_with_separator():
-    script = _read("queue/js/board-ticker.js")
-    board_css = _read("queue/css/board.css")
-    media_css = _read("queue/css/board-media/main.css")
+    script = _read("web/js/board-ticker.js")
+    board_css = _read("web/css/board.css")
+    media_css = _read("web/css/board-media/main.css")
 
     assert ".split(/\\s+\\|\\s+|\\r?\\n/)" in script
     assert ".filter(Boolean)" in script
@@ -561,7 +561,7 @@ def test_board_ticker_splits_multiline_messages_with_separator():
 
 
 def test_admin_tickets_use_manual_refresh_and_readable_window_names():
-    source = _read("queue/js/admin/views/tickets.view.js")
+    source = _read("web/js/admin/views/tickets.view.js")
 
     assert "↻ Обновить таблицу" in source
     assert 'button.dataset.action === "refresh"' in source
@@ -572,7 +572,7 @@ def test_admin_tickets_use_manual_refresh_and_readable_window_names():
     assert "ticket.root_ticket_id" not in source
     assert 'class="admin-ticket-action-list"' in source
 
-    styles = _read("queue/css/admin/tickets.css")
+    styles = _read("web/css/admin/tickets.css")
     assert "max-width: 100%;" in styles
     assert ".admin-ticket-page .admin-table-scroll" in styles
     assert "overflow-x: auto;" in styles

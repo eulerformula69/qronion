@@ -138,7 +138,7 @@ def test_close_day_session_expiration_redirects_operator_without_browser_alert()
     websocket_source = (PROJECT_ROOT / "app/routers/websocket.py").read_text(
         encoding="utf-8"
     )
-    operator_source = (PROJECT_ROOT / "queue/js/operator.js").read_text(
+    operator_source = (PROJECT_ROOT / "web/js/operator.js").read_text(
         encoding="utf-8"
     )
 

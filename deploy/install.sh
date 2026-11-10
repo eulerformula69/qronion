@@ -86,8 +86,8 @@ if [[ -n "${SUDO_USER:-}" && "${SUDO_USER}" != "root" ]] && id "${SUDO_USER}" >/
     INSTALL_GROUP="$(id -gn "${INSTALL_USER}")"
 fi
 
-if [[ ! -f "${SOURCE_DIR}/main.py" || ! -d "${SOURCE_DIR}/queue" ]]; then
-    fail "в корне проекта должны находиться main.py и папка queue"
+if [[ ! -f "${SOURCE_DIR}/main.py" || ! -d "${SOURCE_DIR}/web" ]]; then
+    fail "в корне проекта должны находиться main.py и папка web"
 fi
 
 if [[ ! -f /etc/os-release ]]; then
@@ -174,11 +174,9 @@ install -m 0750 "${SOURCE_DIR}/deploy/db_common.sh" "${APP_DIR}/deploy/db_common
 install -m 0750 "${SOURCE_DIR}/deploy/backup_db.sh" "${APP_DIR}/deploy/backup_db.sh"
 install -m 0750 "${SOURCE_DIR}/deploy/restore_db.sh" "${APP_DIR}/deploy/restore_db.sh"
 install -d -m 0770 -o root -g "${APP_USER}" /var/backups/queue/db
-install -d -o "${APP_USER}" -g "${APP_USER}" "${APP_DIR}/queue"
-rsync -a --delete \
-    --exclude 'media/' \
-    --exclude 'tts/cache/' \
-    "${SOURCE_DIR}/queue/" "${APP_DIR}/queue/"
+install -d -o "${APP_USER}" -g "${APP_USER}" "${APP_DIR}/web" "${APP_DIR}/queue/tts"
+rsync -a --delete "${SOURCE_DIR}/web/" "${APP_DIR}/web/"
+rsync -a --exclude 'cache/' "${SOURCE_DIR}/queue/tts/" "${APP_DIR}/queue/tts/"
 install -d -o "${APP_USER}" -g "${APP_USER}" \
     "${APP_DIR}/queue/media" "${APP_DIR}/queue/tts/cache"
 
@@ -565,24 +563,24 @@ fi
 
 log "Проверяю запуск"
 for _ in {1..30}; do
-    if curl --fail --silent --output /dev/null http://127.0.0.1:8000/queue/login.html; then
+    if curl --fail --silent --output /dev/null http://127.0.0.1:8000/login.html; then
         break
     fi
     sleep 1
 done
 
-if ! curl --fail --silent --output /dev/null http://127.0.0.1:8000/queue/login.html; then
+if ! curl --fail --silent --output /dev/null http://127.0.0.1:8000/login.html; then
     journalctl -u "${SERVICE_NAME}" -n 30 --no-pager >&2
     fail "приложение не ответило. Выше показан журнал ошибки"
 fi
 
 HTTP_STATUS="$(curl --silent --noproxy '*' --output /dev/null --write-out '%{http_code}' \
-    "http://${SERVER_IP}/queue/login.html" || true)"
+    "http://${SERVER_IP}/login.html" || true)"
 [[ "${HTTP_STATUS}" == "200" ]] \
     || fail "Nginx по HTTP вернул код ${HTTP_STATUS} вместо 200"
 
 HTTPS_STATUS="$(curl --silent --insecure --noproxy '*' --output /dev/null --write-out '%{http_code}' \
-    "https://${SERVER_IP}/queue/login.html" || true)"
+    "https://${SERVER_IP}/login.html" || true)"
 [[ "${HTTPS_STATUS}" == "200" ]] \
     || fail "Nginx по HTTPS вернул код ${HTTPS_STATUS} вместо 200"
 
@@ -637,10 +635,10 @@ if [[ -n "${INSTALL_USER}" && -n "${INSTALL_HOME}" ]]; then
 fi
 
 printf '\n\033[1;32mУстановка завершена.\033[0m\n'
-printf 'HTTP:       http://%s/queue/login.html\n' "${SERVER_IP}"
-printf 'HTTPS:      https://%s/queue/login.html\n' "${SERVER_IP}"
-printf 'Терминал:   http://%s/queue/terminal.html\n' "${SERVER_IP}"
-printf 'Табло:      http://%s/queue/board.html?screen=media\n' "${SERVER_IP}"
+printf 'HTTP:       http://%s/login.html\n' "${SERVER_IP}"
+printf 'HTTPS:      https://%s/login.html\n' "${SERVER_IP}"
+printf 'Терминал:   http://%s/terminal.html\n' "${SERVER_IP}"
+printf 'Табло:      http://%s/board.html?screen=media\n' "${SERVER_IP}"
 printf 'Статистика: https://%s/grafana/d/queue-statistics/queue-statistics\n' "${SERVER_IP}"
 if [[ -n "${INSTALL_USER}" && -n "${INSTALL_HOME}" ]]; then
     printf 'Проект:     %s (доступ для %s)\n' "${APP_DIR}" "${INSTALL_USER}"

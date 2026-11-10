@@ -1,5 +1,5 @@
 (function () {
-    const CHANGELOG_URL = "/queue/changelog/operator.json";
+    const CHANGELOG_URL = "/changelog/operator.json";
     const STORAGE_KEY = "operatorChangelogVersion";
     const CHECK_INTERVAL_MS = 60000;
     const ACTIVITY_CHECK_COOLDOWN_MS = 30000;

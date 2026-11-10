@@ -7,8 +7,8 @@
 Расширить `install.sh`, чтобы он автоматически выпускал локальный TLS-сертификат через `mkcert` и настраивал одновременную работу:
 
 ```text
-http://IP-СЕРВЕРА/queue/login.html
-https://IP-СЕРВЕРА/queue/login.html
+http://IP-СЕРВЕРА/login.html
+https://IP-СЕРВЕРА/login.html
 ```
 
 HTTP не должен автоматически перенаправляться на HTTPS. Оба протокола должны работать независимо, как описано в инструкции `Настройка Nginx HTTP HTTPS с mkcert.md`.
@@ -25,7 +25,7 @@ HTTP не должен автоматически перенаправлятьс
 8. Не перенаправлять HTTP на HTTPS.
 9. Добавить HTTP- и HTTPS-origin в `CORS_ORIGINS`.
 10. Сохранить поддержку WebSocket через `ws://` и `wss://`.
-11. Не изменять текущий динамический `queue/js/config.js`.
+11. Не изменять текущий динамический `web/js/config.js`.
 12. Не открывать Uvicorn наружу: приложение продолжает слушать `127.0.0.1:8000`.
 13. Сохранить один worker Uvicorn из-за хранения WebSocket-соединений в памяти.
 14. Не проксировать Grafana через Nginx: она остаётся на `http://IP:3000`.
@@ -48,8 +48,8 @@ sudo QUEUE_SERVER_IP=192.168.0.20 bash install.sh
 В итоговом экране необходимо показать адреса обоих протоколов:
 
 ```text
-HTTP:        http://192.168.0.20/queue/login.html
-HTTPS:       https://192.168.0.20/queue/login.html
+HTTP:        http://192.168.0.20/login.html
+HTTPS:       https://192.168.0.20/login.html
 Сертификат: ~/queue-rootCA.pem
 ```
 
@@ -172,8 +172,8 @@ sudo update-ca-certificates
 На сервере:
 
 ```bash
-curl -I http://IP-СЕРВЕРА/queue/login.html
-curl -k -I https://IP-СЕРВЕРА/queue/login.html
+curl -I http://IP-СЕРВЕРА/login.html
+curl -k -I https://IP-СЕРВЕРА/login.html
 openssl x509 -in /etc/nginx/tls/queue.pem -noout -ext subjectAltName
 sudo nginx -t
 sudo systemctl status queue nginx

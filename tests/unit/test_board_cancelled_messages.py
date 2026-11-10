@@ -18,9 +18,9 @@ def test_board_state_contains_temporary_cancelled_messages():
 
 
 def test_all_standard_board_profiles_merge_system_and_user_ticker_messages():
-    ticker = read_text("queue/js/board-ticker.js")
-    board = read_text("queue/js/board.js")
-    lite = read_text("queue/js/board-lite.js")
+    ticker = read_text("web/js/board-ticker.js")
+    board = read_text("web/js/board.js")
+    lite = read_text("web/js/board-lite.js")
 
     assert "tickerMessages.map" in ticker
     assert ").concat(systemMessages.map" in ticker

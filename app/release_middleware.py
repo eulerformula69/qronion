@@ -7,7 +7,7 @@ from app.release import get_release_version
 
 
 ASSET_URL_RE = re.compile(
-    rb'(?P<prefix>(?:src|href)=["\'])(?P<url>/queue/(?:js|css)/[^"\'?]+\.(?:js|css))(?P<suffix>["\'])'
+    rb'(?P<prefix>(?:src|href)=["\'])(?P<url>/(?:js|css)/[^"\'?]+\.(?:js|css))(?P<suffix>["\'])'
 )
 
 
@@ -36,7 +36,7 @@ async def release_cache_middleware(request: Request, call_next):
         response.headers["Cache-Control"] = "no-store"
         return response
 
-    if not (path.startswith("/queue/") and path.endswith(".html")):
+    if not path.endswith(".html") or response.status_code != 200:
         return response
 
     body = b"".join([chunk async for chunk in response.body_iterator])

@@ -18,7 +18,7 @@ from deploy.update_from_git import (  # noqa: E402
 @pytest.mark.parametrize(
     ("path", "expected"),
     [
-        ("./queue/js/config.js", "queue/js/config.js"),
+        ("./web/js/config.js", "web/js/config.js"),
         ("queue\\media\\clip.mp4", "queue/media/clip.mp4"),
     ],
 )
@@ -49,7 +49,7 @@ def test_is_excluded_local_files(relative_path):
     "relative_path",
     [
         "app/routers/tickets.py",
-        "queue/js/terminal.js",
+        "web/js/terminal.js",
         "requirements.txt",
     ],
 )

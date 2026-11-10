@@ -125,16 +125,16 @@ function setForm(html){
 document.getElementById("form").innerHTML=html
 }
 
-// SERVICES moved to /queue/js/admin/services.js
+// SERVICES moved to /js/admin/services.js
 
-// WINDOWS moved to /queue/js/admin/windows.js
+// WINDOWS moved to /js/admin/windows.js
 
 //////// ОПЕРАТОРЫ
-// OPERATORS moved to /queue/js/admin/operators.js
+// OPERATORS moved to /js/admin/operators.js
 
-// SETTINGS and STATS moved to /queue/js/admin/settings.js
+// SETTINGS and STATS moved to /js/admin/settings.js
 
-// MAP moved to /queue/js/admin/map.js
+// MAP moved to /js/admin/map.js
 
 function setActiveTab(tabId) {
     // Убираем класс active у всех кнопок
@@ -178,7 +178,7 @@ async function ExitPage() {
     }
 }
 
-// MEDIA FILES moved to /queue/js/admin/media.js
+// MEDIA FILES moved to /js/admin/media.js
 
 setInterval(() => {
     const sid = sessionStorage.getItem("session_id");

@@ -34,9 +34,9 @@ def test_ticket_without_service_started_at_has_no_artificial_wait():
 
 
 def test_operator_restores_service_timer_from_service_started_at():
-    operator_source = read_text("queue/js/operator.js")
-    timer_source = read_text("queue/js/operator-ticket-timers.js")
-    html = read_text("queue/operator.html")
+    operator_source = read_text("web/js/operator.js")
+    timer_source = read_text("web/js/operator-ticket-timers.js")
+    html = read_text("web/operator.html")
 
     assert "currentTicketServiceStartedAt = parseTicketServiceStartedAt(ticket);" in operator_source
     assert "calledTicketWaitRemainingSeconds" in timer_source
@@ -50,8 +50,8 @@ def test_operator_restores_service_timer_from_service_started_at():
 
 
 def test_finish_button_uses_wait_state_but_other_actions_do_not():
-    state_source = read_text("queue/js/operator-ui-state.js")
-    css = read_text("queue/css/operator.css")
+    state_source = read_text("web/js/operator-ui-state.js")
+    css = read_text("web/css/operator.css")
 
     assert 'button.id === "finish-btn" && isCalledTicketWaitActive()' in state_source
     assert '"current-ticket-action-inactive"' in state_source
@@ -73,9 +73,9 @@ def test_recall_cooldown_uses_latest_server_timestamp():
 
 
 def test_recall_cooldown_restores_from_server_state_after_reload():
-    operator_source = read_text("queue/js/operator.js")
-    timer_source = read_text("queue/js/operator-ticket-timers.js")
-    state_source = read_text("queue/js/operator-ui-state.js")
+    operator_source = read_text("web/js/operator.js")
+    timer_source = read_text("web/js/operator-ticket-timers.js")
+    state_source = read_text("web/js/operator-ui-state.js")
 
     assert "currentTicketRecallRemainingSeconds" in operator_source
     assert "recallCooldownRemainingSeconds" in timer_source
@@ -102,8 +102,8 @@ def test_recall_response_returns_fresh_server_countdown():
 
 
 def test_admin_can_configure_called_ticket_min_wait():
-    modern_source = read_text("queue/js/admin/views/settings.view.js")
-    legacy_source = read_text("queue/js/admin/settings.js")
+    modern_source = read_text("web/js/admin/views/settings.view.js")
+    legacy_source = read_text("web/js/admin/settings.js")
 
     for source in (modern_source, legacy_source):
         assert "called_ticket_min_wait_seconds" in source
