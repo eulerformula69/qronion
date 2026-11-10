@@ -19,6 +19,35 @@ confirm() {
     [[ "${answer}" == д || "${answer}" == Д || "${answer}" == y || "${answer}" == Y ]]
 }
 
+restore_database() (
+    local backup_dir="${BACKUP_ROOT:-/var/backups/queue/db}" dump
+    local -a copies
+    shopt -s nullglob
+    copies=("${backup_dir}"/*.dump)
+    if (( ${#copies[@]} == 0 )); then
+        printf 'В %s пока нет копий БД. Создать копию можно в пункте 5.\n' "${backup_dir}"
+        return 0
+    fi
+    printf 'Выберите копию по имени файла. Для отмены введите 0.\n'
+    PS3='Номер копии: '
+    select dump in "${copies[@]}"; do
+        [[ "${REPLY}" != 0 ]] || return 0
+        if [[ -z "${dump}" ]]; then
+            printf 'Введите номер из списка или 0.\n'
+            continue
+        fi
+        mkdir -p /var/lib/queue-update || return 1
+        exec 9>/var/lib/queue-update/lock || return 1
+        flock -n 9 || { printf 'Сервер занят установкой или обновлением.\n'; return 1; }
+        if [[ -f /var/lib/queue-update/pending.json ]]; then
+            printf 'Сначала завершите восстановление обновления через пункт 6.\n'
+            return 1
+        fi
+        bash "${APP_DIR}/deploy/restore_db.sh" "${dump}" --project-dir "${APP_DIR}"
+        return $?
+    done
+)
+
 while true; do
     printf '\nQronion · управление сервером\n\n'
     if [[ -f "${APP_DIR}/.queue-installed" ]]; then
@@ -29,7 +58,7 @@ while true; do
     printf '1. Установить на чистую Ubuntu 24.04\n'
     printf '2. Проверить обновления\n3. Обновить очередь\n'
     printf '4. Проверить состояние\n5. Создать резервную копию БД\n'
-    printf '6. Восстановить после прерванного обновления\n0. Выйти\n\n'
+    printf '6. Восстановить после прерванного обновления\n7. Восстановить БД из копии\n0. Выйти\n\n'
     read -r -p 'Выберите пункт: ' action || exit 0
     result=0
     case "${action}" in
@@ -78,6 +107,9 @@ while true; do
             ;;
         5)
             bash "${APP_DIR}/deploy/backup_db.sh" --project-dir "${APP_DIR}" || result=$?
+            ;;
+        7)
+            restore_database || result=$?
             ;;
         0) exit 0 ;;
         *) printf 'Введите номер пункта.\n'; continue ;;
